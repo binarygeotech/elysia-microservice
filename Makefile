@@ -1,4 +1,5 @@
-.PHONY: help install clean build test lint format publish
+.PHONY: help install clean build test lint format publish \
+	changeset changeset-status release-version release-publish release-local
 
 # Default target
 .DEFAULT_GOAL := help
@@ -313,6 +314,119 @@ docker-up: ## Start Docker services (Redis, NATS, Kafka)
 docker-down: ## Stop Docker services
 	@echo "$(BLUE)Stopping Docker services...$(NC)"
 	@docker-compose down
+
+# Release (Changesets) targets
+changeset: ## Create a new changeset (interactive)
+	@echo "$(BLUE)Starting Changesets...$(NC)"
+	@bun x changeset
+
+changeset-status: ## Show unreleased changes and version plan
+	@echo "$(BLUE)Changesets status (unreleased changes) ...$(NC)"
+	@bun x changeset status --verbose || true
+
+release-version: ## Apply version bumps and update changelogs (changesets)
+	@echo "$(BLUE)Applying version changes with Changesets...$(NC)"
+	@bun x changeset version
+	@echo "$(BLUE)Updating lockfile...$(NC)"
+	@bun install
+	@echo "$(YELLOW)Reminder: commit the version changes before publishing$(NC)"
+
+release-publish: build test ## Publish all changed packages to npm (requires NPM_TOKEN)
+	@if [ -z "$$NPM_TOKEN" ]; then \
+		echo "$(RED)Error: NPM_TOKEN is not set in environment.$(NC)"; \
+		echo "$(YELLOW)Set it once in your shell: export NPM_TOKEN=...$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(BLUE)Publishing via Changesets...$(NC)"
+	@bun x changeset publish
+	@echo "$(GREEN)✓ Publish complete$(NC)"
+
+release-local: ## Version + publish locally (version, install, build, publish)
+	@$(MAKE) release-version
+	@$(MAKE) build
+	@$(MAKE) test
+	@$(MAKE) release-publish
+
+# Single-package release helpers
+.PHONY: build-one publish-one publish-one-dry changeset-add-one
+
+build-one: ## Build a single package (usage: make build-one PKG=@elysia-microservice/transport-tcp)
+	@if [ -z "$(PKG)" ]; then \
+		echo "$(RED)Error: PKG is required. Example: make build-one PKG=@elysia-microservice/transport-tcp$(NC)"; \
+		exit 1; \
+	fi
+	@dir=$$(for d in packages/*; do \
+		if [ -f "$$d/package.json" ]; then \
+			name=$$(jq -r .name $$d/package.json); \
+			if [ "$$name" = "$(PKG)" ]; then echo $$d; fi; \
+		fi; \
+	done); \
+	if [ -z "$$dir" ]; then \
+		echo "$(RED)Package $(PKG) not found under packages/*$(NC)"; \
+		exit 1; \
+	fi; \
+	echo "$(BLUE)Building $$dir...$(NC)"; \
+	cd $$dir && bun run build && echo "$(GREEN)✓ Built $(PKG)$(NC)"
+
+publish-one-dry: ## Dry run publish for a single package (usage: make publish-one-dry PKG=@elysia-microservice/transport-tcp)
+	@if [ -z "$(PKG)" ]; then \
+		echo "$(RED)Error: PKG is required. Example: make publish-one-dry PKG=@elysia-microservice/transport-tcp$(NC)"; \
+		exit 1; \
+	fi
+	@dir=$$(for d in packages/*; do \
+		if [ -f "$$d/package.json" ]; then \
+			name=$$(jq -r .name $$d/package.json); \
+			if [ "$$name" = "$(PKG)" ]; then echo $$d; fi; \
+		fi; \
+	done); \
+	if [ -z "$$dir" ]; then \
+		echo "$(RED)Package $(PKG) not found under packages/*$(NC)"; \
+		exit 1; \
+	fi; \
+	echo "$(YELLOW)Dry publishing $$dir...$(NC)"; \
+	cd $$dir && npm publish --dry-run --access public && echo "$(GREEN)✓ Dry publish ok $(NC)"
+
+publish-one: ## Publish a single package to npm (usage: make publish-one PKG=@elysia-microservice/transport-tcp)
+	@if [ -z "$(PKG)" ]; then \
+		echo "$(RED)Error: PKG is required. Example: make publish-one PKG=@elysia-microservice/transport-tcp$(NC)"; \
+		exit 1; \
+	fi
+	@if [ -z "$$NPM_TOKEN" ]; then \
+		echo "$(YELLOW)Note: NPM_TOKEN not set; make sure you're logged in with npm CLI$(NC)"; \
+	fi
+	@dir=$$(for d in packages/*; do \
+		if [ -f "$$d/package.json" ]; then \
+			name=$$(jq -r .name $$d/package.json); \
+			if [ "$$name" = "$(PKG)" ]; then echo $$d; fi; \
+		fi; \
+	done); \
+	if [ -z "$$dir" ]; then \
+		echo "$(RED)Package $(PKG) not found under packages/*$(NC)"; \
+		exit 1; \
+	fi; \
+	echo "$(BLUE)Publishing $$dir...$(NC)"; \
+	cd $$dir && npm publish --access public && echo "$(GREEN)✓ Published $(PKG)$(NC)"
+
+BUMP?=patch
+MSG?=Release $(PKG)
+changeset-add-one: ## Create a changeset for one package (usage: make changeset-add-one PKG=@elysia-microservice/transport-tcp BUMP=patch MSG="fix: ...")
+	@if [ -z "$(PKG)" ]; then \
+		echo "$(RED)Error: PKG is required. Example: make changeset-add-one PKG=@elysia-microservice/core BUMP=patch MSG=\"fix: ...\"$(NC)"; \
+		exit 1; \
+	fi
+	@if [ "$(BUMP)" != "patch" ] && [ "$(BUMP)" != "minor" ] && [ "$(BUMP)" != "major" ]; then \
+		echo "$(RED)Error: BUMP must be patch|minor|major$(NC)"; \
+		exit 1; \
+	fi
+	@mkdir -p .changeset; \
+	id=$$(date +%Y%m%d%H%M%S)-$$(echo "$(PKG)" | tr -cd '[:alnum:]' | tr '[:upper:]' '[:lower:]'); \
+	file=.changeset/$$id.md; \
+	echo "---" > $$file; \
+	echo '"$(PKG)": $(BUMP)' >> $$file; \
+	echo "---" >> $$file; \
+	echo "" >> $$file; \
+	echo "$(MSG)" >> $$file; \
+	echo "$(GREEN)✓ Created $$file for $(PKG) ($(BUMP))$(NC)"
 	@echo "$(GREEN)✓ Docker services stopped$(NC)"
 
 docker-logs: ## Show Docker service logs

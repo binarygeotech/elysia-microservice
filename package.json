@@ -31,9 +31,13 @@
     "test:unit": "cd packages/core && bun test",
     "test:integration": "bun test tests/",
     "test:all": "bun run test:unit && bun run test:integration",
-    "clean": "find packages -name 'dist' -type d -exec rm -rf {} + 2>/dev/null || true"
+    "clean": "find packages -name 'dist' -type d -exec rm -rf {} + 2>/dev/null || true",
+    "changeset": "changeset",
+    "release:version": "changeset version",
+    "release:publish": "changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.8",
     "@elysia-microservice/client-base": "workspace:*",
     "@elysia-microservice/transport-tcp": "workspace:*",
     "@elysia-microservice/transport-tls": "workspace:*",

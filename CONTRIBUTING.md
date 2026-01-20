@@ -394,48 +394,88 @@ When adding new features, update or create relevant documentation:
 
 ## Release Process
 
-Maintainers handle releases. The process is:
+We use [Changesets](https://github.com/changesets/changesets) to manage versions and publish packages. This ensures only changed packages get version bumps, and internal `workspace:*` dependencies are bumped appropriately.
 
-1. **Update Versions**
-   ```bash
-   # Update all package.json files with new version
-   make version VERSION=0.2.0
-   ```
+### Prerequisites
 
-2. **Update Changelog**
-   - Edit [CHANGELOG.md](CHANGELOG.md)
-   - Document all changes under the new version
-   - Include breaking changes, new features, and bug fixes
+- You must be able to publish to npm for the organization
+- Set `NPM_TOKEN` in your environment (for local publish) or in GitHub repo secrets (for CI)
 
-3. **Commit and Tag**
-   ```bash
-   git add .
-   git commit -m "chore: release v0.2.0"
-   git tag v0.2.0
-   git push origin main --tags
-   ```
+```bash
+export NPM_TOKEN=your-npm-token
+```
 
-4. **Build and Test**
-   ```bash
-   make clean
-   make build
-   make test
-   ```
+### Standard Release (Changesets)
 
-5. **Publish**
-   ```bash
-   # Dry run first
-   make publish-dry
-   
-   # Actual publish
-   make publish
-   ```
+1. Create changesets (for each change)
+  ```bash
+  # Interactive: select packages and bump types
+  make changeset
 
-6. **Create GitHub Release**
-   - Go to GitHub releases
-   - Create new release from tag
-   - Copy changelog content
-   - Publish release
+  # OR one-package helper
+  make changeset-add-one PKG=@elysia-microservice/core BUMP=patch MSG="fix: tighten validation"
+  ```
+
+2. Review pending release plan
+  ```bash
+  make changeset-status
+  ```
+
+3. Apply versions and changelogs
+  ```bash
+  make release-version
+  git add . && git commit -m "chore(release): version packages"
+  ```
+
+4. Publish changed packages
+  ```bash
+  # Option A: Local publish
+  make release-publish
+
+  # Option B: CI publish (recommended)
+  # Push to main; Changesets GitHub Action will open a Release PR.
+  # When that PR is merged, it will publish automatically using NPM_TOKEN.
+  ```
+
+### Single Package Release
+
+Use this when you need to publish just one package (e.g., a transport) outside the coordinated release:
+
+```bash
+# Build just one
+make build-one PKG=@elysia-microservice/transport-tcp
+
+# Create a changeset for the package
+make changeset-add-one PKG=@elysia-microservice/transport-tcp BUMP=patch MSG="fix: connection timeout handling"
+
+# Apply versions and commit
+make release-version
+git add . && git commit -m "chore(release): version transport-tcp"
+
+# Dry-run publish for that package
+make publish-one-dry PKG=@elysia-microservice/transport-tcp
+
+# Publish that package
+make publish-one PKG=@elysia-microservice/transport-tcp
+```
+
+### Legacy Manual Release (Not Recommended)
+
+If needed, you can still perform a manual release. Prefer Changesets for accuracy and safety.
+
+1. Update versions manually
+  ```bash
+  make version VERSION=0.2.0
+  ```
+
+2. Update [CHANGELOG.md](CHANGELOG.md) manually, commit, tag and push
+
+3. Build, test and publish
+  ```bash
+  make clean && make build && make test
+  make publish-dry
+  make publish
+  ```
 
 ## Questions?
 
