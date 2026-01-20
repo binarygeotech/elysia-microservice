@@ -1,12 +1,24 @@
 {
   "name": "@elysia-microservice/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Core functionality for Elysia microservices framework",
+  "author": {
+    "name": "Okojie George",
+    "email": "binarygeotech@gmail.com",
+    "url": "https://linkedin.com/in/okojie-george"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/binarygeotech/elysia-microservice.git"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "bun run src/index.ts",
@@ -14,7 +26,11 @@
     "lint": "eslint . --ext .ts",
     "prepublishOnly": "npm run build"
   },
-  "keywords": ["elysia", "microservices", "core"],
+  "keywords": [
+    "elysia",
+    "microservices",
+    "core"
+  ],
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^25.0.3",

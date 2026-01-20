@@ -1,18 +1,35 @@
 {
   "name": "@elysia-microservice/client-base",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Base client utilities and factory for Elysia microservices",
+  "author": {
+    "name": "Okojie George",
+    "email": "binarygeotech@gmail.com",
+    "url": "https://linkedin.com/in/okojie-george"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/binarygeotech/elysia-microservice.git"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc--watch",
     "clean": "rm -rf dist"
   },
-  "keywords": ["elysia", "microservices", "client", "factory"],
+  "keywords": [
+    "elysia",
+    "microservices",
+    "client",
+    "factory"
+  ],
   "license": "MIT",
   "dependencies": {
     "@elysia-microservice/core": "workspace:*"
@@ -29,10 +46,20 @@
     "@elysia-microservice/client-kafka": "workspace:*"
   },
   "peerDependenciesMeta": {
-    "@elysia-microservice/client-tcp": { "optional": true },
-    "@elysia-microservice/client-tls": { "optional": true },
-    "@elysia-microservice/client-nats": { "optional": true },
-    "@elysia-microservice/client-redis": { "optional": true },
-    "@elysia-microservice/client-kafka": { "optional": true }
+    "@elysia-microservice/client-tcp": {
+      "optional": true
+    },
+    "@elysia-microservice/client-tls": {
+      "optional": true
+    },
+    "@elysia-microservice/client-nats": {
+      "optional": true
+    },
+    "@elysia-microservice/client-redis": {
+      "optional": true
+    },
+    "@elysia-microservice/client-kafka": {
+      "optional": true
+    }
   }
 }

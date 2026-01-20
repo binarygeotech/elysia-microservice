@@ -318,28 +318,76 @@ docker-down: ## Stop Docker services
 # Release (Changesets) targets
 changeset: ## Create a new changeset (interactive)
 	@echo "$(BLUE)Starting Changesets...$(NC)"
-	@bun x changeset
+	@npx changeset
 
-changeset-status: ## Show unreleased changes and version plan
-	@echo "$(BLUE)Changesets status (unreleased changes) ...$(NC)"
-	@bun x changeset status --verbose || true
+changeset-status: ## Show pending releases (concise)
+	@echo "$(BLUE)Changesets status (pending releases) ...$(NC)"
+	@npx changeset status || true
+
+changeset-status-verbose: ## Show full status incl. unchanged packages
+	@echo "$(BLUE)Changesets status (verbose, includes unchanged) ...$(NC)"
+	@npx changeset status --verbose || true
+
+changeset-status-json: ## Show status as JSON for tooling
+	@npx changeset status --output=json || true
+
+changeset-plan: ## Show only packages that will be released (name -> newVersion (type))
+	@echo "$(BLUE)Changesets release plan (changed packages only)...$(NC)"
+	@npx changeset status --output=json | jq -r 'if ([.releases[] | select(.type != "none")] | length) == 0 then "No packages will be released" else [.releases[] | select(.type != "none")][] | "\(.name) @ \(.oldVersion) -> \(.newVersion) (\(.type))" end'
+
+changeset-plan-one: ## Show release info for one package (usage: make changeset-plan-one PKG=@elysia-microservice/core)
+	@if [ -z "$(PKG)" ]; then \
+		echo "$(RED)Error: PKG is required. Example: make changeset-plan-one PKG=@elysia-microservice/core$(NC)"; \
+		exit 1; \
+	fi
+	@npx changeset status --output=json | jq -r --arg PKG "$(PKG)" '[.releases[] | select(.name == $PKG)] | if length == 0 then "No release planned for " + $PKG else .[] | "\(.name) @ \(.oldVersion) -> \(.newVersion) (\(.type))" end'
 
 release-version: ## Apply version bumps and update changelogs (changesets)
 	@echo "$(BLUE)Applying version changes with Changesets...$(NC)"
-	@bun x changeset version
+	@npx changeset version
 	@echo "$(BLUE)Updating lockfile...$(NC)"
 	@bun install
 	@echo "$(YELLOW)Reminder: commit the version changes before publishing$(NC)"
 
-release-publish: build test ## Publish all changed packages to npm (requires NPM_TOKEN)
-	@if [ -z "$$NPM_TOKEN" ]; then \
-		echo "$(RED)Error: NPM_TOKEN is not set in environment.$(NC)"; \
-		echo "$(YELLOW)Set it once in your shell: export NPM_TOKEN=...$(NC)"; \
-		exit 1; \
-	fi
-	@echo "$(BLUE)Publishing via Changesets...$(NC)"
-	@bun x changeset publish
-	@echo "$(GREEN)✓ Publish complete$(NC)"
+# AUTH_MODE?=cli
+# release-publish: build test ## Publish all changed packages to npm (requires NPM_TOKEN)
+# 	@if [ -z "$$NPM_TOKEN" and "$AUTH_MODE" === "token"]; then \
+# 		echo "$(RED)Error: NPM_TOKEN is not set in environment.$(NC)"; \
+# 		echo "$(YELLOW)Set it once in your shell: export NPM_TOKEN=...$(NC)"; \
+# 		exit 1; \
+# 	fi
+# 	@echo "$(BLUE)Publishing via Changesets...$(NC)"
+# 	@npx changeset publish
+# 	@echo "$(GREEN)✓ Publish complete$(NC)"
+
+# Default auth mode (can be overridden)
+NPM_AUTH_MODE?=cli
+export NPM_AUTH_MODE
+release-publish: build test ## Publish all changed packages to npm
+	@auth_mode="$(NPM_AUTH_MODE)"; \
+	if [ -n "$$CI" ]; then \
+		auth_mode="oidc"; \
+	fi; \
+	echo "Here $$NPM_AUTH_MODE n $$auth_mode"; \
+	auth_mode=$$(printf "%s" "$$auth_mode" | tr "[:upper:]" "[:lower:]"); \
+	echo "Here $$NPM_AUTH_MODE n $$auth_mode"; \
+	case "$$auth_mode" in \
+		cli|oidc) ;; \
+		token) \
+			if [ -z "$$NPM_TOKEN" ]; then \
+				echo "$(RED)Error: NPM_TOKEN is not set in environment.$(NC)"; \
+				echo "$(YELLOW)Set it once in your shell: export NPM_TOKEN=...$(NC)"; \
+				exit 1; \
+			fi ;; \
+		*) \
+			echo "$(RED)Error: Unknown NPM_AUTH_MODE '$$auth_mode'.$(NC)"; \
+			echo "$(YELLOW)Valid values: cli | token | oidc$(NC)"; \
+			exit 1 ;; \
+	esac; \
+	\
+	echo "$(BLUE)Publishing via Changesets (auth mode: $$auth_mode)...$(NC)"; \
+	npx changeset publish; \
+	echo "$(GREEN)✓ Publish complete$(NC)"
 
 release-local: ## Version + publish locally (version, install, build, publish)
 	@$(MAKE) release-version

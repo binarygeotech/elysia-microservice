@@ -7,5 +7,8 @@
   "updateInternalDependencies": "patch",
   "bumpVersionsWithWorkspaceProtocolOnly": true,
   "fixed": [],
-  "linked": []
+  "linked": [],
+  "ignore": [
+    "examples"
+  ]
 }

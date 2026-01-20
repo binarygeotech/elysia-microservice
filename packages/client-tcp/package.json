@@ -1,18 +1,35 @@
 {
   "name": "@elysia-microservice/client-tcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "TCP client for Elysia microservices",
+  "author": {
+    "name": "Okojie George",
+    "email": "binarygeotech@gmail.com",
+    "url": "https://linkedin.com/in/okojie-george"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/binarygeotech/elysia-microservice.git"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "clean": "rm -rf dist"
   },
-  "keywords": ["elysia", "microservices", "tcp", "client"],
+  "keywords": [
+    "elysia",
+    "microservices",
+    "tcp",
+    "client"
+  ],
   "license": "MIT",
   "dependencies": {
     "@elysia-microservice/core": "workspace:*"
