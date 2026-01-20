@@ -1,0 +1,379 @@
+.PHONY: help install clean build test lint format publish
+
+# Default target
+.DEFAULT_GOAL := help
+
+# Colors for output
+BLUE := \033[0;34m
+GREEN := \033[0;32m
+YELLOW := \033[0;33m
+RED := \033[0;31m
+NC := \033[0m # No Color
+
+help: ## Display this help message
+	@echo "$(BLUE)Elysia Microservice Framework$(NC)"
+	@echo "$(BLUE)=============================$(NC)"
+	@echo ""
+	@echo "Available targets:"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-20s$(NC) %s\n", $$1, $$2}'
+	@echo ""
+
+install: ## Install all dependencies
+	@echo "$(BLUE)Installing dependencies...$(NC)"
+	@bun install
+	@echo "$(GREEN)✓ Dependencies installed$(NC)"
+
+clean: ## Clean all build artifacts
+	@echo "$(BLUE)Cleaning build artifacts...$(NC)"
+	@find packages -name 'dist' -type d -exec rm -rf {} + 2>/dev/null || true
+	@echo "$(YELLOW)Note: Run 'make install' after clean to relink workspace packages$(NC)"
+	@echo "$(GREEN)✓ Build artifacts cleaned$(NC)"
+
+# Build targets
+build: ## Build all packages (in correct order)
+	@echo "$(BLUE)Building all packages...$(NC)"
+	@bun run build
+	@echo "$(GREEN)✓ All packages built successfully$(NC)"
+
+build-core: ## Build core package
+	@echo "$(BLUE)Building core package...$(NC)"
+	@cd packages/core && bun run build
+	@echo "$(GREEN)✓ Core package built$(NC)"
+
+build-utils: ## Build utils package
+	@echo "$(BLUE)Building utils package...$(NC)"
+	@cd packages/utils && bun run build
+	@echo "$(GREEN)✓ Utils package built$(NC)"
+
+build-transports: ## Build all transport packages
+	@echo "$(BLUE)Building transport packages...$(NC)"
+	@cd packages/transport-tcp && bun run build
+	@cd packages/transport-tls && bun run build
+	@cd packages/transport-nats && bun run build
+	@cd packages/transport-redis && bun run build
+	@cd packages/transport-kafka && bun run build
+	@echo "$(GREEN)✓ Transport packages built$(NC)"
+
+build-clients: ## Build all client packages
+	@echo "$(BLUE)Building client packages...$(NC)"
+	@cd packages/client-tcp && bun run build
+	@cd packages/client-tls && bun run build
+	@cd packages/client-nats && bun run build
+	@cd packages/client-redis && bun run build
+	@cd packages/client-kafka && bun run build
+	@cd packages/client-base && bun run build
+	@echo "$(GREEN)✓ Client packages built$(NC)"
+
+build-adapters: ## Build adapters package
+	@echo "$(BLUE)Building adapters package...$(NC)"
+	@cd packages/adapters && bun run build
+	@echo "$(GREEN)✓ Adapters package built$(NC)"
+
+rebuild: install build ## Clean, install, and rebuild all packages
+
+# Test targets
+test: ## Run all tests
+	@echo "$(BLUE)Running all tests...$(NC)"
+	@bun test
+	@echo "$(GREEN)✓ All tests passed$(NC)"
+
+test-unit: ## Run unit tests only
+	@echo "$(BLUE)Running unit tests...$(NC)"
+	@bun run test:unit
+	@echo "$(GREEN)✓ Unit tests passed$(NC)"
+
+test-integration: ## Run integration tests only
+	@echo "$(BLUE)Running integration tests...$(NC)"
+	@bun run test:integration
+	@echo "$(GREEN)✓ Integration tests passed$(NC)"
+
+test-coverage: ## Run tests with coverage
+	@echo "$(BLUE)Running tests with coverage...$(NC)"
+	@bun test --coverage
+	@echo "$(GREEN)✓ Coverage report generated$(NC)"
+
+test-watch: ## Run tests in watch mode
+	@echo "$(BLUE)Running tests in watch mode...$(NC)"
+	@bun test --watch
+
+# Lint and format targets
+lint: ## Lint all packages
+	@echo "$(BLUE)Linting packages...$(NC)"
+	@for dir in packages/*; do \
+		if [ -f "$$dir/package.json" ]; then \
+			echo "Linting $$dir..."; \
+			cd $$dir && npm run lint 2>/dev/null || echo "No lint script in $$dir"; \
+			cd ../..; \
+		fi \
+	done
+	@echo "$(GREEN)✓ Linting complete$(NC)"
+
+format: ## Format code with prettier
+	@echo "$(BLUE)Formatting code...$(NC)"
+	@bunx prettier --write "packages/*/src/**/*.ts" "packages/*/tests/**/*.ts"
+	@echo "$(GREEN)✓ Code formatted$(NC)"
+
+format-check: ## Check code formatting
+	@echo "$(BLUE)Checking code formatting...$(NC)"
+	@bunx prettier --check "packages/*/src/**/*.ts" "packages/*/tests/**/*.ts"
+
+# Development targets
+dev: ## Start development mode (rebuild on changes)
+	@echo "$(BLUE)Starting development mode...$(NC)"
+	@bun run build --watch
+
+dev-core: ## Start core package in development mode
+	@echo "$(BLUE)Starting core development...$(NC)"
+	@cd packages/core && bun run dev
+
+# Example targets
+example-hybrid: ## Run hybrid example (HTTP + Microservice)
+	@echo "$(BLUE)Running hybrid example...$(NC)"
+	@cd examples && bun run hybrid
+
+example-standalone: ## Run standalone microservice example
+	@echo "$(BLUE)Running standalone example...$(NC)"
+	@cd examples && bun run standalone
+
+example-patterns: ## Run pattern matching example
+	@echo "$(BLUE)Running pattern matching example...$(NC)"
+	@cd examples && bun run src/pattern-matching-server.ts
+
+# Validation targets
+validate: clean install build test ## Full validation (clean, install, build, test)
+	@echo "$(GREEN)✓ Full validation passed$(NC)"
+
+check: build test lint format-check ## Quick validation (build, test, lint, format check)
+	@echo "$(GREEN)✓ Quick check passed$(NC)"
+
+# Version management
+version: ## Update version in all packages (usage: make version VERSION=0.2.0)
+	@if [ -z "$(VERSION)" ]; then \
+		echo "$(RED)Error: VERSION is required. Usage: make version VERSION=0.2.0$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(BLUE)Updating version to $(VERSION)...$(NC)"
+	@jq '.version = "$(VERSION)"' package.json > package.json.tmp && mv package.json.tmp package.json
+	@for dir in packages/*; do \
+		if [ -f "$$dir/package.json" ]; then \
+			jq '.version = "$(VERSION)"' $$dir/package.json > $$dir/package.json.tmp && mv $$dir/package.json.tmp $$dir/package.json; \
+		fi \
+	done
+	@echo "$(GREEN)✓ Version updated to $(VERSION)$(NC)"
+
+# Publishing targets
+publish-check: ## Check if packages are ready for publishing
+	@echo "$(BLUE)Checking packages for publishing...$(NC)"
+	@for dir in packages/*; do \
+		if [ -f "$$dir/package.json" ]; then \
+			echo "Checking $$dir..."; \
+			cd $$dir && npm pack --dry-run; \
+			cd ../..; \
+		fi \
+	done
+	@echo "$(GREEN)✓ Publish check complete$(NC)"
+
+publish-dry: build test ## Dry run publish (test without actually publishing)
+	@echo "$(YELLOW)Performing dry run publish...$(NC)"
+	@for dir in packages/*; do \
+		if [ -f "$$dir/package.json" ]; then \
+			echo "Dry run: $$dir..."; \
+			cd $$dir && npm publish --dry-run --access public; \
+			cd ../..; \
+		fi \
+	done
+	@echo "$(GREEN)✓ Dry run complete$(NC)"
+
+publish: build test ## Publish all packages to npm
+	@echo "$(YELLOW)⚠️  Publishing to npm...$(NC)"
+	@read -p "Are you sure you want to publish? (y/N): " confirm; \
+	if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
+		for dir in packages/*; do \
+			if [ -f "$$dir/package.json" ]; then \
+				echo "Publishing $$dir..."; \
+				cd $$dir && npm publish --access public; \
+				cd ../..; \
+			fi \
+		done; \
+		echo "$(GREEN)✓ All packages published$(NC)"; \
+	else \
+		echo "$(YELLOW)Publish cancelled$(NC)"; \
+	fi
+
+publish-core: ## Publish only core package
+	@echo "$(BLUE)Publishing core package...$(NC)"
+	@cd packages/core && npm publish --access public
+	@echo "$(GREEN)✓ Core package published$(NC)"
+
+publish-utils: ## Publish only utils package
+	@echo "$(BLUE)Publishing utils package...$(NC)"
+	@cd packages/utils && npm publish --access public
+	@echo "$(GREEN)✓ Utils package published$(NC)"
+
+publish-adapters: ## Publish only adapters package
+	@echo "$(BLUE)Publishing adapters package...$(NC)"
+	@cd packages/adapters && npm publish --access public
+	@echo "$(GREEN)✓ Adapters package published$(NC)"
+
+publish-transports: ## Publish all transport packages
+	@echo "$(BLUE)Publishing transport packages...$(NC)"
+	@for dir in packages/transport-*; do \
+		cd $$dir && npm publish --access public; \
+		cd ../..; \
+	done
+	@echo "$(GREEN)✓ Transport packages published$(NC)"
+
+publish-transport-tcp: ## Publish TCP transport package
+	@echo "$(BLUE)Publishing TCP transport...$(NC)"
+	@cd packages/transport-tcp && npm publish --access public
+	@echo "$(GREEN)✓ TCP transport published$(NC)"
+
+publish-transport-tls: ## Publish TLS transport package
+	@echo "$(BLUE)Publishing TLS transport...$(NC)"
+	@cd packages/transport-tls && npm publish --access public
+	@echo "$(GREEN)✓ TLS transport published$(NC)"
+
+publish-transport-nats: ## Publish NATS transport package
+	@echo "$(BLUE)Publishing NATS transport...$(NC)"
+	@cd packages/transport-nats && npm publish --access public
+	@echo "$(GREEN)✓ NATS transport published$(NC)"
+
+publish-transport-redis: ## Publish Redis transport package
+	@echo "$(BLUE)Publishing Redis transport...$(NC)"
+	@cd packages/transport-redis && npm publish --access public
+	@echo "$(GREEN)✓ Redis transport published$(NC)"
+
+publish-transport-kafka: ## Publish Kafka transport package
+	@echo "$(BLUE)Publishing Kafka transport...$(NC)"
+	@cd packages/transport-kafka && npm publish --access public
+	@echo "$(GREEN)✓ Kafka transport published$(NC)"
+
+publish-clients: ## Publish all client packages
+	@echo "$(BLUE)Publishing client packages...$(NC)"
+	@for dir in packages/client-*; do \
+		cd $$dir && npm publish --access public; \
+		cd ../..; \
+	done
+	@echo "$(GREEN)✓ Client packages published$(NC)"
+
+publish-client-base: ## Publish client-base package
+	@echo "$(BLUE)Publishing client-base...$(NC)"
+	@cd packages/client-base && npm publish --access public
+	@echo "$(GREEN)✓ Client-base published$(NC)"
+
+publish-client-tcp: ## Publish TCP client package
+	@echo "$(BLUE)Publishing TCP client...$(NC)"
+	@cd packages/client-tcp && npm publish --access public
+	@echo "$(GREEN)✓ TCP client published$(NC)"
+
+publish-client-tls: ## Publish TLS client package
+	@echo "$(BLUE)Publishing TLS client...$(NC)"
+	@cd packages/client-tls && npm publish --access public
+	@echo "$(GREEN)✓ TLS client published$(NC)"
+
+publish-client-nats: ## Publish NATS client package
+	@echo "$(BLUE)Publishing NATS client...$(NC)"
+	@cd packages/client-nats && npm publish --access public
+	@echo "$(GREEN)✓ NATS client published$(NC)"
+
+publish-client-redis: ## Publish Redis client package
+	@echo "$(BLUE)Publishing Redis client...$(NC)"
+	@cd packages/client-redis && npm publish --access public
+	@echo "$(GREEN)✓ Redis client published$(NC)"
+
+publish-client-kafka: ## Publish Kafka client package
+	@echo "$(BLUE)Publishing Kafka client...$(NC)"
+	@cd packages/client-kafka && npm publish --access public
+	@echo "$(GREEN)✓ Kafka client published$(NC)"
+
+# Documentation targets
+docs-serve: ## Serve documentation locally
+	@echo "$(BLUE)Serving documentation...$(NC)"
+	@if command -v mdbook > /dev/null; then \
+		mdbook serve docs; \
+	else \
+		echo "$(YELLOW)mdbook not installed. Install with: cargo install mdbook$(NC)"; \
+	fi
+
+docs-build: ## Build documentation
+	@echo "$(BLUE)Building documentation...$(NC)"
+	@echo "$(GREEN)✓ Documentation in docs/ directory$(NC)"
+
+# Docker targets
+docker-build: ## Build Docker images for examples
+	@echo "$(BLUE)Building Docker images...$(NC)"
+	@docker-compose build
+	@echo "$(GREEN)✓ Docker images built$(NC)"
+
+docker-up: ## Start Docker services (Redis, NATS, Kafka)
+	@echo "$(BLUE)Starting Docker services...$(NC)"
+	@docker-compose up -d
+	@echo "$(GREEN)✓ Docker services started$(NC)"
+
+docker-down: ## Stop Docker services
+	@echo "$(BLUE)Stopping Docker services...$(NC)"
+	@docker-compose down
+	@echo "$(GREEN)✓ Docker services stopped$(NC)"
+
+docker-logs: ## Show Docker service logs
+	@docker-compose logs -f
+
+# CI/CD helpers
+ci: install build test lint format-check ## Run CI pipeline locally
+	@echo "$(GREEN)✓ CI pipeline passed$(NC)"
+
+pre-commit: format lint test ## Run pre-commit checks
+	@echo "$(GREEN)✓ Pre-commit checks passed$(NC)"
+
+pre-push: build test ## Run pre-push checks
+	@echo "$(GREEN)✓ Pre-push checks passed$(NC)"
+
+# Stats and info
+stats: ## Show project statistics
+	@echo "$(BLUE)Project Statistics$(NC)"
+	@echo "$(BLUE)==================$(NC)"
+	@echo "Packages: $$(ls -d packages/* | wc -l | tr -d ' ')"
+	@echo "TypeScript files: $$(find packages -name '*.ts' | wc -l | tr -d ' ')"
+	@echo "Test files: $$(find packages -name '*.test.ts' | wc -l | tr -d ' ')"
+	@echo "Lines of code: $$(find packages -name '*.ts' -exec cat {} \; | wc -l | tr -d ' ')"
+
+list-packages: ## List all packages
+	@echo "$(BLUE)Packages:$(NC)"
+	@for dir in packages/*; do \
+		if [ -f "$$dir/package.json" ]; then \
+			name=$$(jq -r '.name' $$dir/package.json); \
+			version=$$(jq -r '.version' $$dir/package.json); \
+			echo "  $(GREEN)$$name$(NC) @ $(YELLOW)$$version$(NC)"; \
+		fi \
+	done
+
+# Dependency management
+deps-update: ## Update all dependencies
+	@echo "$(BLUE)Updating dependencies...$(NC)"
+	@bun update
+	@echo "$(GREEN)✓ Dependencies updated$(NC)"
+
+deps-check: ## Check for outdated dependencies
+	@echo "$(BLUE)Checking for outdated dependencies...$(NC)"
+	@bun outdated
+
+deps-audit: ## Run security audit
+	@echo "$(BLUE)Running security audit...$(NC)"
+	@npm audit
+
+# Quick commands
+quick-test: ## Quick test (unit tests only, no build)
+	@bun run test:unit
+
+quick-build: ## Quick build (no clean)
+	@bun run build
+
+.PHONY: help install clean build test lint format publish validate check \
+        build-core build-utils build-transports build-clients build-adapters \
+        test-unit test-integration test-coverage test-watch \
+        format-check dev dev-core \
+        example-hybrid example-standalone example-patterns \
+        version publish-check publish-dry publish-core publish-transports publish-clients \
+        docs-serve docs-build docker-build docker-up docker-down docker-logs \
+        ci pre-commit pre-push stats list-packages \
+        deps-update deps-check deps-audit quick-test quick-build rebuild

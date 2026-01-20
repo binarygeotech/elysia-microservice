@@ -1,0 +1,28 @@
+{
+  "name": "@elysia-microservice/client-kafka",
+  "version": "0.1.0",
+  "description": "Kafka client for Elysia microservices",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["elysia", "microservices", "kafka", "client"],
+  "license": "MIT",
+  "dependencies": {
+    "@elysia-microservice/core": "workspace:*",
+    "kafkajs": "^2.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "kafkajs": "^2.2.4"
+  }
+}

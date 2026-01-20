@@ -1,0 +1,24 @@
+{
+  "name": "@elysia-microservice/client-tls",
+  "version": "0.1.0",
+  "description": "TLS client for Elysia microservices",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["elysia", "microservices", "tls", "client", "ssl"],
+  "license": "MIT",
+  "dependencies": {
+    "@elysia-microservice/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.3"
+  }
+}

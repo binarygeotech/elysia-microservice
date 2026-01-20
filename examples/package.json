@@ -1,0 +1,16 @@
+{
+  "name": "examples",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "elysia": "^1.4.22",
+    "@elysia-microservice/core": "workspace:*",
+    "@elysia-microservice/client-tcp": "workspace:*",
+    "@elysia-microservice/transport-tcp": "workspace:*"
+  },
+  "scripts": {
+    "tcp-client": "bun run src/tcp-client.ts",
+    "hybrid": "bun run src/hybrid-server.ts",
+    "standalone": "bun run src/standalone-server.ts"
+  }
+}

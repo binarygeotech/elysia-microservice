@@ -1,0 +1,128 @@
+name: 💡 Feature Request
+description: Suggest a new feature or enhancement
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please fill out the form below to help us understand your proposal.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: Is your feature request related to a problem? Please describe.
+      placeholder: I'm frustrated when...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the solution you'd like to see
+      placeholder: I would like to be able to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe any alternative solutions or features you've considered
+      placeholder: I've also thought about...
+
+  - type: dropdown
+    id: package
+    attributes:
+      label: Which package(s) would this affect?
+      multiple: true
+      options:
+        - "@elysia-microservice/core"
+        - "@elysia-microservice/utils"
+        - "@elysia-microservice/transport-tcp"
+        - "@elysia-microservice/transport-tls"
+        - "@elysia-microservice/transport-nats"
+        - "@elysia-microservice/transport-redis"
+        - "@elysia-microservice/transport-kafka"
+        - "@elysia-microservice/client-tcp"
+        - "@elysia-microservice/client-tls"
+        - "@elysia-microservice/client-nats"
+        - "@elysia-microservice/client-redis"
+        - "@elysia-microservice/client-kafka"
+        - "@elysia-microservice/client-base"
+        - "@elysia-microservice/adapters"
+        - "New package"
+        - "Documentation"
+        - "Not sure"
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Example implementation
+      description: If you have ideas about how this could be implemented, share them here
+      render: typescript
+      placeholder: |
+        // Example API usage
+        registry.registerMessage('pattern', handler, {
+          // New feature usage
+        });
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: How important is this feature to you?
+      options:
+        - "Critical - Blocking my work"
+        - "High - Would significantly improve my workflow"
+        - "Medium - Nice to have"
+        - "Low - Minor improvement"
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-cases
+    attributes:
+      label: Use cases
+      description: Describe specific use cases where this feature would be helpful
+      placeholder: |
+        1. When building microservices that...
+        2. For applications that need to...
+
+  - type: dropdown
+    id: breaking
+    attributes:
+      label: Would this be a breaking change?
+      options:
+        - "No - Backward compatible"
+        - "Yes - Breaking change"
+        - "Not sure"
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Add any other context, screenshots, or examples about the feature request
+      placeholder: Any additional information that might help?
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I'm willing to submit a PR to implement this feature
+          required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/yourusername/elysia-microservice/blob/main/CODE_OF_CONDUCT.md)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true

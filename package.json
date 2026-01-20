@@ -1,0 +1,46 @@
+{
+  "name": "@elysia-microservice/base",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Transport-agnostic microservices for Elysia with NestJS TCP compatibility - Monorepo",
+  "keywords": ["elysia", "microservices", "tcp", "tls", "nats", "redis", "kafka", "nestjs"],
+  "license": "MIT",
+  "workspaces": [
+    "packages/*",
+    "examples"
+  ],
+  "scripts": {
+    "build": "bun run build:core && bun run build:utils && bun run build:transports && bun run build:clients && bun run build:client-base && bun run build:adapters",
+    "build:core": "cd packages/core && bun run build",
+    "build:utils": "cd packages/utils && bun run build",
+    "build:transports": "bun run build:transport-tcp && bun run build:transport-tls && bun run build:transport-nats && bun run build:transport-redis && bun run build:transport-kafka",
+    "build:transport-tcp": "cd packages/transport-tcp && bun run build",
+    "build:transport-tls": "cd packages/transport-tls && bun run build",
+    "build:transport-nats": "cd packages/transport-nats && bun run build",
+    "build:transport-redis": "cd packages/transport-redis && bun run build",
+    "build:transport-kafka": "cd packages/transport-kafka && bun run build",
+    "build:clients": "bun run build:client-tcp && bun run build:client-tls && bun run build:client-nats && bun run build:client-redis && bun run build:client-kafka",
+    "build:client-tcp": "cd packages/client-tcp && bun run build",
+    "build:client-tls": "cd packages/client-tls && bun run build",
+    "build:client-nats": "cd packages/client-nats && bun run build",
+    "build:client-redis": "cd packages/client-redis && bun run build",
+    "build:client-kafka": "cd packages/client-kafka && bun run build",
+    "build:client-base": "cd packages/client-base && bun run build",
+    "build:adapters": "cd packages/adapters && bun run build",
+    "test": "bun test",
+    "test:unit": "cd packages/core && bun test",
+    "test:integration": "bun test tests/",
+    "test:all": "bun run test:unit && bun run test:integration",
+    "clean": "find packages -name 'dist' -type d -exec rm -rf {} + 2>/dev/null || true"
+  },
+  "devDependencies": {
+    "@elysia-microservice/client-base": "workspace:*",
+    "@elysia-microservice/transport-tcp": "workspace:*",
+    "@elysia-microservice/transport-tls": "workspace:*",
+    "@elysia-microservice/utils": "workspace:*",
+    "@types/node": "^25.0.3",
+    "bun-types": "^1.3.5",
+    "elysia": "^1.4.22",
+    "typescript": "^5.9.3"
+  }
+}

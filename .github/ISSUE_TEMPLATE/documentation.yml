@@ -1,0 +1,87 @@
+name: 📚 Documentation Issue
+description: Report an issue with documentation
+title: "[Docs]: "
+labels: ["documentation", "triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve our documentation! Please describe what needs to be updated.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Documentation issue type
+      options:
+        - "Missing documentation"
+        - "Incorrect information"
+        - "Unclear explanation"
+        - "Broken link"
+        - "Typo or grammar"
+        - "Outdated content"
+        - "Other"
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Documentation location
+      description: Where is the issue? (URL or file path)
+      placeholder: "docs/guides/getting-started.md or https://..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue
+    attributes:
+      label: What's wrong?
+      description: Describe the issue with the current documentation
+      placeholder: The documentation says X but it should say Y because...
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested improvement
+      description: How should the documentation be improved?
+      placeholder: It would be better to explain...
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Additional examples needed?
+      description: If you need more code examples, describe what would be helpful
+      render: typescript
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: How much does this impact users?
+      options:
+        - "Critical - Documentation is misleading"
+        - "High - Important information missing"
+        - "Medium - Could cause confusion"
+        - "Low - Minor improvement"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I'm willing to submit a PR to fix this
+          required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/yourusername/elysia-microservice/blob/main/CODE_OF_CONDUCT.md)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true

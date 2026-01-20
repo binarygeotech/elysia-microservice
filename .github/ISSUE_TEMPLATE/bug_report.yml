@@ -1,0 +1,168 @@
+name: 🐛 Bug Report
+description: Report a bug or unexpected behavior
+title: "[Bug]: "
+labels: ["bug", "triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the form below to help us investigate.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Install packages '...'
+        2. Create server with '...'
+        3. Send request '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+      placeholder: What should have happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happened?
+      placeholder: What did you observe instead?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: package
+    attributes:
+      label: Which package(s) are affected?
+      multiple: true
+      options:
+        - "@elysia-microservice/core"
+        - "@elysia-microservice/utils"
+        - "@elysia-microservice/transport-tcp"
+        - "@elysia-microservice/transport-tls"
+        - "@elysia-microservice/transport-nats"
+        - "@elysia-microservice/transport-redis"
+        - "@elysia-microservice/transport-kafka"
+        - "@elysia-microservice/client-tcp"
+        - "@elysia-microservice/client-tls"
+        - "@elysia-microservice/client-nats"
+        - "@elysia-microservice/client-redis"
+        - "@elysia-microservice/client-kafka"
+        - "@elysia-microservice/client-base"
+        - "@elysia-microservice/adapters"
+        - "Not sure"
+    validations:
+      required: true
+
+  - type: input
+    id: package-version
+    attributes:
+      label: Package version(s)
+      description: Which version(s) are you using?
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: Runtime
+      description: Which JavaScript runtime are you using?
+      options:
+        - Bun
+        - Node.js
+        - Deno
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: runtime-version
+    attributes:
+      label: Runtime version
+      description: Which version of the runtime?
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      description: Which operating system are you using?
+      options:
+        - macOS
+        - Linux
+        - Windows
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: os-version
+    attributes:
+      label: OS version
+      description: Which version of the operating system?
+      placeholder: "macOS 14.0, Ubuntu 22.04, Windows 11"
+
+  - type: textarea
+    id: code
+    attributes:
+      label: Minimal reproduction code
+      description: Please provide minimal code that reproduces the issue
+      render: typescript
+      placeholder: |
+        import { Elysia } from 'elysia';
+        import { Microservice } from '@elysia-microservice/core';
+        
+        const app = new Elysia()
+          .use(Microservice({ 
+            server: { transport: 'tcp', options: { port: 4000 } }
+          }))
+          .onMsMessage('test', (ctx) => {
+            // Bug occurs here
+          });
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error logs
+      description: Please copy and paste any relevant error logs
+      render: shell
+      placeholder: Paste error messages here
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here (screenshots, related issues, etc.)
+      placeholder: Any additional information that might help?
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/yourusername/elysia-microservice/blob/main/CODE_OF_CONDUCT.md)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true

@@ -1,0 +1,24 @@
+{
+  "name": "@elysia-microservice/transport-tcp",
+  "version": "0.1.0",
+  "description": "TCP transport for Elysia microservices",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["elysia", "microservices", "tcp", "transport"],
+  "license": "MIT",
+  "dependencies": {
+    "@elysia-microservice/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.3"
+  }
+}

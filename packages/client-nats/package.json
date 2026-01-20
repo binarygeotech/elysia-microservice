@@ -1,0 +1,28 @@
+{
+  "name": "@elysia-microservice/client-nats",
+  "version": "0.1.0",
+  "description": "NATS client for Elysia microservices",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["elysia", "microservices", "nats", "client"],
+  "license": "MIT",
+  "dependencies": {
+    "@elysia-microservice/core": "workspace:*",
+    "nats": "^2.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "nats": "^2.12.0"
+  }
+}

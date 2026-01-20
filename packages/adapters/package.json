@@ -1,0 +1,24 @@
+{
+  "name": "@elysia-microservice/adapters",
+  "version": "0.1.0",
+  "description": "Adapters for integrating Elysia microservices with other frameworks",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["elysia", "microservices", "adapters", "nestjs"],
+  "license": "MIT",
+  "dependencies": {
+    "@elysia-microservice/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.3"
+  }
+}

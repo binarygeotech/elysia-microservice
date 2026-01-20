@@ -1,0 +1,38 @@
+{
+  "name": "@elysia-microservice/client-base",
+  "version": "0.1.0",
+  "description": "Base client utilities and factory for Elysia microservices",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc--watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["elysia", "microservices", "client", "factory"],
+  "license": "MIT",
+  "dependencies": {
+    "@elysia-microservice/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "@elysia-microservice/client-tcp": "workspace:*",
+    "@elysia-microservice/client-tls": "workspace:*",
+    "@elysia-microservice/client-nats": "workspace:*",
+    "@elysia-microservice/client-redis": "workspace:*",
+    "@elysia-microservice/client-kafka": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@elysia-microservice/client-tcp": { "optional": true },
+    "@elysia-microservice/client-tls": { "optional": true },
+    "@elysia-microservice/client-nats": { "optional": true },
+    "@elysia-microservice/client-redis": { "optional": true },
+    "@elysia-microservice/client-kafka": { "optional": true }
+  }
+}

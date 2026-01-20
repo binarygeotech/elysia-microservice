@@ -1,0 +1,340 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "@elysia-microservice/root",
+      "devDependencies": {
+        "@elysia-microservice/client-base": "workspace:*",
+        "@elysia-microservice/transport-tcp": "workspace:*",
+        "@elysia-microservice/transport-tls": "workspace:*",
+        "@elysia-microservice/utils": "workspace:*",
+        "@types/node": "^25.0.3",
+        "bun-types": "^1.3.5",
+        "elysia": "^1.4.22",
+        "typescript": "^5.9.3",
+      },
+    },
+    "examples": {
+      "name": "examples",
+      "version": "0.0.0",
+      "dependencies": {
+        "@elysia-microservice/client-tcp": "workspace:*",
+        "@elysia-microservice/core": "workspace:*",
+        "@elysia-microservice/transport-tcp": "workspace:*",
+        "elysia": "^1.4.22",
+      },
+    },
+    "packages/adapters": {
+      "name": "@elysia-microservice/adapters",
+      "version": "0.1.0",
+      "dependencies": {
+        "@elysia-microservice/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/node": "^25.0.3",
+        "typescript": "^5.9.3",
+      },
+    },
+    "packages/client-base": {
+      "name": "@elysia-microservice/client-base",
+      "version": "0.1.0",
+      "dependencies": {
+        "@elysia-microservice/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/node": "^25.0.3",
+        "typescript": "^5.9.3",
+      },
+      "peerDependencies": {
+        "@elysia-microservice/client-kafka": "workspace:*",
+        "@elysia-microservice/client-nats": "workspace:*",
+        "@elysia-microservice/client-redis": "workspace:*",
+        "@elysia-microservice/client-tcp": "workspace:*",
+        "@elysia-microservice/client-tls": "workspace:*",
+      },
+      "optionalPeers": [
+        "@elysia-microservice/client-kafka",
+        "@elysia-microservice/client-nats",
+        "@elysia-microservice/client-redis",
+        "@elysia-microservice/client-tcp",
+        "@elysia-microservice/client-tls",
+      ],
+    },
+    "packages/client-kafka": {
+      "name": "@elysia-microservice/client-kafka",
+      "version": "0.1.0",
+      "dependencies": {
+        "@elysia-microservice/core": "workspace:*",
+        "kafkajs": "^2.2.4",
+      },
+      "devDependencies": {
+        "@types/node": "^25.0.3",
+        "typescript": "^5.9.3",
+      },
+      "peerDependencies": {
+        "kafkajs": "^2.2.4",
+      },
+    },
+    "packages/client-nats": {
+      "name": "@elysia-microservice/client-nats",
+      "version": "0.1.0",
+      "dependencies": {
+        "@elysia-microservice/core": "workspace:*",
+        "nats": "^2.12.0",
+      },
+      "devDependencies": {
+        "@types/node": "^25.0.3",
+        "typescript": "^5.9.3",
+      },
+      "peerDependencies": {
+        "nats": "^2.12.0",
+      },
+    },
+    "packages/client-redis": {
+      "name": "@elysia-microservice/client-redis",
+      "version": "0.1.0",
+      "dependencies": {
+        "@elysia-microservice/core": "workspace:*",
+        "redis": "^4.6.0",
+      },
+      "devDependencies": {
+        "@types/node": "^25.0.3",
+        "typescript": "^5.9.3",
+      },
+      "peerDependencies": {
+        "redis": "^4.6.0",
+      },
+    },
+    "packages/client-tcp": {
+      "name": "@elysia-microservice/client-tcp",
+      "version": "0.1.0",
+      "dependencies": {
+        "@elysia-microservice/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/node": "^25.0.3",
+        "typescript": "^5.9.3",
+      },
+    },
+    "packages/client-tls": {
+      "name": "@elysia-microservice/client-tls",
+      "version": "0.1.0",
+      "dependencies": {
+        "@elysia-microservice/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/node": "^25.0.3",
+        "typescript": "^5.9.3",
+      },
+    },
+    "packages/core": {
+      "name": "@elysia-microservice/core",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@types/node": "^25.0.3",
+        "elysia": "^0.5.0",
+        "typescript": "^5.9.3",
+      },
+      "peerDependencies": {
+        "elysia": "^0.5.0",
+      },
+      "optionalPeers": [
+        "elysia",
+      ],
+    },
+    "packages/transport-kafka": {
+      "name": "@elysia-microservice/transport-kafka",
+      "version": "0.1.0",
+      "dependencies": {
+        "@elysia-microservice/core": "workspace:*",
+        "kafkajs": "^2.2.4",
+      },
+      "devDependencies": {
+        "@types/node": "^25.0.3",
+        "typescript": "^5.9.3",
+      },
+      "peerDependencies": {
+        "kafkajs": "^2.2.4",
+      },
+    },
+    "packages/transport-nats": {
+      "name": "@elysia-microservice/transport-nats",
+      "version": "0.1.0",
+      "dependencies": {
+        "@elysia-microservice/core": "workspace:*",
+        "nats": "^2.12.0",
+      },
+      "devDependencies": {
+        "@types/node": "^25.0.3",
+        "typescript": "^5.9.3",
+      },
+      "peerDependencies": {
+        "nats": "^2.12.0",
+      },
+    },
+    "packages/transport-redis": {
+      "name": "@elysia-microservice/transport-redis",
+      "version": "0.1.0",
+      "dependencies": {
+        "@elysia-microservice/core": "workspace:*",
+        "redis": "^4.6.0",
+      },
+      "devDependencies": {
+        "@types/node": "^25.0.3",
+        "typescript": "^5.9.3",
+      },
+      "peerDependencies": {
+        "redis": "^4.6.0",
+      },
+    },
+    "packages/transport-tcp": {
+      "name": "@elysia-microservice/transport-tcp",
+      "version": "0.1.0",
+      "dependencies": {
+        "@elysia-microservice/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/node": "^25.0.3",
+        "typescript": "^5.9.3",
+      },
+    },
+    "packages/transport-tls": {
+      "name": "@elysia-microservice/transport-tls",
+      "version": "0.1.0",
+      "dependencies": {
+        "@elysia-microservice/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/node": "^25.0.3",
+        "typescript": "^5.9.3",
+      },
+    },
+    "packages/utils": {
+      "name": "@elysia-microservice/utils",
+      "version": "0.1.0",
+      "dependencies": {
+        "@elysia-microservice/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/node": "^25.0.3",
+        "typescript": "^5.9.3",
+      },
+    },
+  },
+  "packages": {
+    "@borewit/text-codec": ["@borewit/text-codec@0.2.1", "", {}, "sha512-k7vvKPbf7J2fZ5klGRD9AeKfUvojuZIQ3BT5u7Jfv+puwXkUBUT5PVyMDfJZpy30CBDXGMgw7fguK/lpOMBvgw=="],
+
+    "@elysia-microservice/adapters": ["@elysia-microservice/adapters@workspace:packages/adapters"],
+
+    "@elysia-microservice/client-base": ["@elysia-microservice/client-base@workspace:packages/client-base"],
+
+    "@elysia-microservice/client-kafka": ["@elysia-microservice/client-kafka@workspace:packages/client-kafka"],
+
+    "@elysia-microservice/client-nats": ["@elysia-microservice/client-nats@workspace:packages/client-nats"],
+
+    "@elysia-microservice/client-redis": ["@elysia-microservice/client-redis@workspace:packages/client-redis"],
+
+    "@elysia-microservice/client-tcp": ["@elysia-microservice/client-tcp@workspace:packages/client-tcp"],
+
+    "@elysia-microservice/client-tls": ["@elysia-microservice/client-tls@workspace:packages/client-tls"],
+
+    "@elysia-microservice/core": ["@elysia-microservice/core@workspace:packages/core"],
+
+    "@elysia-microservice/transport-kafka": ["@elysia-microservice/transport-kafka@workspace:packages/transport-kafka"],
+
+    "@elysia-microservice/transport-nats": ["@elysia-microservice/transport-nats@workspace:packages/transport-nats"],
+
+    "@elysia-microservice/transport-redis": ["@elysia-microservice/transport-redis@workspace:packages/transport-redis"],
+
+    "@elysia-microservice/transport-tcp": ["@elysia-microservice/transport-tcp@workspace:packages/transport-tcp"],
+
+    "@elysia-microservice/transport-tls": ["@elysia-microservice/transport-tls@workspace:packages/transport-tls"],
+
+    "@elysia-microservice/utils": ["@elysia-microservice/utils@workspace:packages/utils"],
+
+    "@redis/bloom": ["@redis/bloom@1.2.0", "", { "peerDependencies": { "@redis/client": "^1.0.0" } }, "sha512-HG2DFjYKbpNmVXsa0keLHp/3leGJz1mjh09f2RLGGLQZzSHpkmZWuwJbAvo3QcRY8p80m5+ZdXZdYOSBLlp7Cg=="],
+
+    "@redis/client": ["@redis/client@1.6.1", "", { "dependencies": { "cluster-key-slot": "1.1.2", "generic-pool": "3.9.0", "yallist": "4.0.0" } }, "sha512-/KCsg3xSlR+nCK8/8ZYSknYxvXHwubJrU82F3Lm1Fp6789VQ0/3RJKfsmRXjqfaTA++23CvC3hqmqe/2GEt6Kw=="],
+
+    "@redis/graph": ["@redis/graph@1.1.1", "", { "peerDependencies": { "@redis/client": "^1.0.0" } }, "sha512-FEMTcTHZozZciLRl6GiiIB4zGm5z5F3F6a6FZCyrfxdKOhFlGkiAqlexWMBzCi4DcRoyiOsuLfW+cjlGWyExOw=="],
+
+    "@redis/json": ["@redis/json@1.0.7", "", { "peerDependencies": { "@redis/client": "^1.0.0" } }, "sha512-6UyXfjVaTBTJtKNG4/9Z8PSpKE6XgSyEb8iwaqDcy+uKrd/DGYHTWkUdnQDyzm727V7p21WUMhsqz5oy65kPcQ=="],
+
+    "@redis/search": ["@redis/search@1.2.0", "", { "peerDependencies": { "@redis/client": "^1.0.0" } }, "sha512-tYoDBbtqOVigEDMAcTGsRlMycIIjwMCgD8eR2t0NANeQmgK/lvxNAvYyb6bZDD4frHRhIHkJu2TBRvB0ERkOmw=="],
+
+    "@redis/time-series": ["@redis/time-series@1.1.0", "", { "peerDependencies": { "@redis/client": "^1.0.0" } }, "sha512-c1Q99M5ljsIuc4YdaCwfUEXsofakb9c8+Zse2qxTadu8TalLXuAESzLvFAvNVbkmSlvlzIQOLpBCmWI9wTOt+g=="],
+
+    "@sinclair/typebox": ["@sinclair/typebox@0.34.47", "", {}, "sha512-ZGIBQ+XDvO5JQku9wmwtabcVTHJsgSWAHYtVuM9pBNNR5E88v6Jcj/llpmsjivig5X8A8HHOb4/mbEKPS5EvAw=="],
+
+    "@tokenizer/inflate": ["@tokenizer/inflate@0.4.1", "", { "dependencies": { "debug": "^4.4.3", "token-types": "^6.1.1" } }, "sha512-2mAv+8pkG6GIZiF1kNg1jAjh27IDxEPKwdGul3snfztFerfPGI1LjDezZp3i7BElXompqEtPmoPx6c2wgtWsOA=="],
+
+    "@tokenizer/token": ["@tokenizer/token@0.3.0", "", {}, "sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A=="],
+
+    "@types/lodash": ["@types/lodash@4.17.23", "", {}, "sha512-RDvF6wTulMPjrNdCoYRC8gNR880JNGT8uB+REUpC2Ns4pRqQJhGz90wh7rgdXDPpCczF3VGktDuFGVnz8zP7HA=="],
+
+    "@types/lodash.clonedeep": ["@types/lodash.clonedeep@4.5.9", "", { "dependencies": { "@types/lodash": "*" } }, "sha512-19429mWC+FyaAhOLzsS8kZUsI+/GmBAQ0HFiCPsKGU+7pBXOQWhyrY6xNNDwUSX8SMZMJvuFVMF9O5dQOlQK9Q=="],
+
+    "@types/node": ["@types/node@25.0.9", "", { "dependencies": { "undici-types": "~7.16.0" } }, "sha512-/rpCXHlCWeqClNBwUhDcusJxXYDjZTyE8v5oTO7WbL8eij2nKhUeU89/6xgjU7N4/Vh3He0BtyhJdQbDyhiXAw=="],
+
+    "bun-types": ["bun-types@1.3.6", "", { "dependencies": { "@types/node": "*" } }, "sha512-OlFwHcnNV99r//9v5IIOgQ9Uk37gZqrNMCcqEaExdkVq3Avwqok1bJFmvGMCkCE0FqzdY8VMOZpfpR3lwI+CsQ=="],
+
+    "cluster-key-slot": ["cluster-key-slot@1.1.2", "", {}, "sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA=="],
+
+    "cookie": ["cookie@1.1.1", "", {}, "sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ=="],
+
+    "debug": ["debug@4.4.3", "", { "dependencies": { "ms": "^2.1.3" } }, "sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA=="],
+
+    "elysia": ["elysia@1.4.22", "", { "dependencies": { "cookie": "^1.1.1", "exact-mirror": "^0.2.6", "fast-decode-uri-component": "^1.0.1", "memoirist": "^0.4.0" }, "peerDependencies": { "@sinclair/typebox": ">= 0.34.0 < 1", "@types/bun": ">= 1.2.0", "file-type": ">= 20.0.0", "openapi-types": ">= 12.0.0", "typescript": ">= 5.0.0" }, "optionalPeers": ["@types/bun", "typescript"] }, "sha512-Q90VCb1RVFxnFaRV0FDoSylESQQLWgLHFmWciQJdX9h3b2cSasji9KWEUvaJuy/L9ciAGg4RAhUVfsXHg5K2RQ=="],
+
+    "exact-mirror": ["exact-mirror@0.2.6", "", { "peerDependencies": { "@sinclair/typebox": "^0.34.15" }, "optionalPeers": ["@sinclair/typebox"] }, "sha512-7s059UIx9/tnOKSySzUk5cPGkoILhTE4p6ncf6uIPaQ+9aRBQzQjc9+q85l51+oZ+P6aBxh084pD0CzBQPcFUA=="],
+
+    "examples": ["examples@workspace:examples"],
+
+    "fast-decode-uri-component": ["fast-decode-uri-component@1.0.1", "", {}, "sha512-WKgKWg5eUxvRZGwW8FvfbaH7AXSh2cL+3j5fMGzUMCxWBJ3dV3a7Wz8y2f/uQ0e3B6WmodD3oS54jTQ9HVTIIg=="],
+
+    "fast-querystring": ["fast-querystring@1.1.2", "", { "dependencies": { "fast-decode-uri-component": "^1.0.1" } }, "sha512-g6KuKWmFXc0fID8WWH0jit4g0AGBoJhCkJMb1RmbsSEUNvQ+ZC8D6CUZ+GtF8nMzSPXnhiePyyqqipzNNEnHjg=="],
+
+    "file-type": ["file-type@21.3.0", "", { "dependencies": { "@tokenizer/inflate": "^0.4.1", "strtok3": "^10.3.4", "token-types": "^6.1.1", "uint8array-extras": "^1.4.0" } }, "sha512-8kPJMIGz1Yt/aPEwOsrR97ZyZaD1Iqm8PClb1nYFclUCkBi0Ma5IsYNQzvSFS9ib51lWyIw5mIT9rWzI/xjpzA=="],
+
+    "generic-pool": ["generic-pool@3.9.0", "", {}, "sha512-hymDOu5B53XvN4QT9dBmZxPX4CWhBPPLguTZ9MMFeFa/Kg0xWVfylOVNlJji/E7yTZWFd/q9GO5TxDLq156D7g=="],
+
+    "ieee754": ["ieee754@1.2.1", "", {}, "sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA=="],
+
+    "kafkajs": ["kafkajs@2.2.4", "", {}, "sha512-j/YeapB1vfPT2iOIUn/vxdyKEuhuY2PxMBvf5JWux6iSaukAccrMtXEY/Lb7OvavDhOWME589bpLrEdnVHjfjA=="],
+
+    "lodash.clonedeep": ["lodash.clonedeep@4.5.0", "", {}, "sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ=="],
+
+    "memoirist": ["memoirist@0.4.0", "", {}, "sha512-zxTgA0mSYELa66DimuNQDvyLq36AwDlTuVRbnQtB+VuTcKWm5Qc4z3WkSpgsFWHNhexqkIooqpv4hdcqrX5Nmg=="],
+
+    "ms": ["ms@2.1.3", "", {}, "sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA=="],
+
+    "nats": ["nats@2.29.3", "", { "dependencies": { "nkeys.js": "1.1.0" } }, "sha512-tOQCRCwC74DgBTk4pWZ9V45sk4d7peoE2njVprMRCBXrhJ5q5cYM7i6W+Uvw2qUrcfOSnuisrX7bEx3b3Wx4QA=="],
+
+    "nkeys.js": ["nkeys.js@1.1.0", "", { "dependencies": { "tweetnacl": "1.0.3" } }, "sha512-tB/a0shZL5UZWSwsoeyqfTszONTt4k2YS0tuQioMOD180+MbombYVgzDUYHlx+gejYK6rgf08n/2Df99WY0Sxg=="],
+
+    "openapi-types": ["openapi-types@12.1.3", "", {}, "sha512-N4YtSYJqghVu4iek2ZUvcN/0aqH1kRDuNqzcycDxhOUpg7GdvLa2F3DgS6yBNhInhv2r/6I0Flkn7CqL8+nIcw=="],
+
+    "redis": ["redis@4.7.1", "", { "dependencies": { "@redis/bloom": "1.2.0", "@redis/client": "1.6.1", "@redis/graph": "1.1.1", "@redis/json": "1.0.7", "@redis/search": "1.2.0", "@redis/time-series": "1.1.0" } }, "sha512-S1bJDnqLftzHXHP8JsT5II/CtHWQrASX5K96REjWjlmWKrviSOLWmM7QnRLstAWsu1VBBV1ffV6DzCvxNP0UJQ=="],
+
+    "strtok3": ["strtok3@10.3.4", "", { "dependencies": { "@tokenizer/token": "^0.3.0" } }, "sha512-KIy5nylvC5le1OdaaoCJ07L+8iQzJHGH6pWDuzS+d07Cu7n1MZ2x26P8ZKIWfbK02+XIL8Mp4RkWeqdUCrDMfg=="],
+
+    "token-types": ["token-types@6.1.2", "", { "dependencies": { "@borewit/text-codec": "^0.2.1", "@tokenizer/token": "^0.3.0", "ieee754": "^1.2.1" } }, "sha512-dRXchy+C0IgK8WPC6xvCHFRIWYUbqqdEIKPaKo/AcTUNzwLTK6AH7RjdLWsEZcAN/TBdtfUw3PYEgPr5VPr6ww=="],
+
+    "tweetnacl": ["tweetnacl@1.0.3", "", {}, "sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw=="],
+
+    "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
+
+    "uint8array-extras": ["uint8array-extras@1.5.0", "", {}, "sha512-rvKSBiC5zqCCiDZ9kAOszZcDvdAHwwIKJG33Ykj43OKcWsnmcBRL09YTU4nOeHZ8Y2a7l1MgTd08SBe9A8Qj6A=="],
+
+    "undici-types": ["undici-types@7.16.0", "", {}, "sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw=="],
+
+    "yallist": ["yallist@4.0.0", "", {}, "sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A=="],
+
+    "@elysia-microservice/core/elysia": ["elysia@0.5.25", "", { "dependencies": { "@sinclair/typebox": "^0.28.10", "@types/lodash.clonedeep": "^4.5.7", "fast-querystring": "^1.1.1", "lodash.clonedeep": "^4.5.0", "memoirist": "0.1.4", "openapi-types": "^12.1.0" }, "peerDependencies": { "typescript": ">= 5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-m39CDCfosietjgBJxmBpc/OjLWvCekXvxWw594oNVRLo7d83TL2zssoK+z6gZNSKU35eehlxRMPQQgOFHmtvDg=="],
+
+    "@elysia-microservice/core/elysia/@sinclair/typebox": ["@sinclair/typebox@0.28.20", "", {}, "sha512-QCF3BGfacwD+3CKhGsMeixnwOmX4AWgm61nKkNdRStyLVu0mpVFYlDSY8gVBOOED1oSwzbJauIWl/+REj8K5+w=="],
+
+    "@elysia-microservice/core/elysia/memoirist": ["memoirist@0.1.4", "", {}, "sha512-D6GbPSqO2nUVOmm7VZjJc5tC60pkOVUPzLwkKl1vCiYP+2b1cG8N9q1O3P0JmNM68u8vsgefPbxRUCSGxSXD+g=="],
+  }
+}
