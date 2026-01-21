@@ -2,11 +2,23 @@
   "name": "@elysia-microservice/adapters",
   "version": "0.1.2",
   "description": "Adapters for integrating Elysia microservices with other frameworks",
+  "author": {
+    "name": "Okojie George",
+    "email": "binarygeotech@gmail.com",
+    "url": "https://linkedin.com/in/okojie-george"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/binarygeotech/elysia-microservice.git"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
