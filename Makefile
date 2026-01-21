@@ -27,6 +27,7 @@ install: ## Install all dependencies
 clean: ## Clean all build artifacts
 	@echo "$(BLUE)Cleaning build artifacts...$(NC)"
 	@find packages -name 'dist' -type d -exec rm -rf {} + 2>/dev/null || true
+	@find packages -name 'tsconfig.tsbuildinfo' -type f -exec rm -rf {} + 2>/dev/null || true
 	@echo "$(YELLOW)Note: Run 'make install' after clean to relink workspace packages$(NC)"
 	@echo "$(GREEN)✓ Build artifacts cleaned$(NC)"
 
@@ -287,6 +288,101 @@ publish-client-kafka: ## Publish Kafka client package
 	@cd packages/client-kafka && npm publish --access public
 	@echo "$(GREEN)✓ Kafka client published$(NC)"
 
+# Unpublish targets
+unpublish-one: ## Unpublish a single package version (usage: make unpublish-one PKG=@elysia-microservice/transport-tcp VERSION=0.1.0)
+	@if [ -z "$(PKG)" ]; then \
+		echo "$(RED)Error: PKG is required. Example: make unpublish-one PKG=@elysia-microservice/transport-tcp VERSION=0.1.0$(NC)"; \
+		exit 1; \
+	fi
+	@if [ -z "$(VERSION)" ]; then \
+		echo "$(RED)Error: VERSION is required. Example: make unpublish-one PKG=@elysia-microservice/transport-tcp VERSION=0.1.0$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(YELLOW)⚠️  Unpublishing $(PKG)@$(VERSION)...$(NC)"
+	@read -p "Are you sure you want to unpublish $(PKG)@$(VERSION)? This cannot be undone! (y/N): " confirm; \
+	if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
+		npm unpublish $(PKG)@$(VERSION) --force; \
+		echo "$(GREEN)✓ $(PKG)@$(VERSION) unpublished$(NC)"; \
+	else \
+		echo "$(YELLOW)Unpublish cancelled$(NC)"; \
+	fi
+
+unpublish-package: ## Unpublish entire package (all versions) (usage: make unpublish-package PKG=@elysia-microservice/transport-tcp)
+	@if [ -z "$(PKG)" ]; then \
+		echo "$(RED)Error: PKG is required. Example: make unpublish-package PKG=@elysia-microservice/transport-tcp$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(RED)⚠️  WARNING: This will unpublish ALL versions of $(PKG)!$(NC)"
+	@read -p "Type the package name to confirm: " typed_pkg; \
+	if [ "$$typed_pkg" = "$(PKG)" ]; then \
+		npm unpublish $(PKG) --force; \
+		echo "$(GREEN)✓ All versions of $(PKG) unpublished$(NC)"; \
+	else \
+		echo "$(YELLOW)Package name did not match. Unpublish cancelled$(NC)"; \
+	fi
+
+unpublish-all: ## Unpublish all packages at current version (usage: make unpublish-all VERSION=0.1.0)
+	@if [ -z "$(VERSION)" ]; then \
+		echo "$(RED)Error: VERSION is required. Example: make unpublish-all VERSION=0.1.0$(NC)"; \
+		exit 1; \
+	fi
+	echo "$(YELLOW)⚠️  Unpublishing all packages at version $(VERSION)...$(NC)"; \
+	read -p "Are you sure? (y/N): " confirm; \
+	if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
+		for dir in packages/*; do \
+			if [ -f "$$dir/package.json" ]; then \
+				name=$$(jq -r .name $$dir/package.json); \
+				echo "Unpublishing $$name@$(VERSION)..."; \
+				npm unpublish "$$name@$(VERSION)" --force; \
+				echo "$(GREEN)✓ $$name@$(VERSION) unpublished$(NC)"; \
+			fi; \
+		done; \
+		echo "$(GREEN)✓ Unpublishing complete$(NC)"; \
+	else \
+		echo "$(YELLOW)Unpublishing cancelled$(NC)"; \
+	fi
+
+deprecate-one: ## Deprecate a package version (usage: make deprecate-one PKG=@elysia-microservice/transport-tcp VERSION=0.1.0 MSG="Use 0.2.0 instead")
+	@if [ -z "$(PKG)" ]; then \
+		echo "$(RED)Error: PKG is required. Example: make deprecate-one PKG=@elysia-microservice/transport-tcp VERSION=0.1.0 MSG=\"...\"$(NC)"; \
+		exit 1; \
+	fi
+	@if [ -z "$(VERSION)" ]; then \
+		echo "$(RED)Error: VERSION is required.$(NC)"; \
+		exit 1; \
+	fi
+	@msg="$(MSG)"; \
+	if [ -z "$$msg" ]; then \
+		msg="This version is deprecated"; \
+	fi; \
+	echo "$(YELLOW)Deprecating $(PKG)@$(VERSION)...$(NC)"; \
+	npm deprecate $(PKG)@$(VERSION) "$$msg"; \
+	echo "$(GREEN)✓ $(PKG)@$(VERSION) deprecated$(NC)"
+
+deprecate-all: ## Deprecate all packages at current version (usage: make deprecate-all VERSION=0.1.0 MSG="Use 0.2.0")
+	@if [ -z "$(VERSION)" ]; then \
+		echo "$(RED)Error: VERSION is required. Example: make deprecate-all VERSION=0.1.0 MSG=\"Use 0.2.0\"$(NC)"; \
+		exit 1; \
+	fi
+	@msg="$(MSG)"; \
+	if [ -z "$$msg" ]; then \
+		msg="This version is deprecated"; \
+	fi; \
+	echo "$(YELLOW)⚠️  Deprecating all packages at version $(VERSION)...$(NC)"; \
+	read -p "Are you sure? (y/N): " confirm; \
+	if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
+		for dir in packages/*; do \
+			if [ -f "$$dir/package.json" ]; then \
+				name=$$(jq -r .name $$dir/package.json); \
+				echo "Deprecating $$name@$(VERSION)..."; \
+				npm deprecate $$name@$(VERSION) "$$msg" || echo "  $(YELLOW)Warning: Could not deprecate $$name@$(VERSION)$(NC)"; \
+			fi; \
+		done; \
+		echo "$(GREEN)✓ Deprecation complete$(NC)"; \
+	else \
+		echo "$(YELLOW)Deprecation cancelled$(NC)"; \
+	fi
+
 # Documentation targets
 docs-serve: ## Serve documentation locally
 	@echo "$(BLUE)Serving documentation...$(NC)"
@@ -314,32 +410,81 @@ docker-up: ## Start Docker services (Redis, NATS, Kafka)
 docker-down: ## Stop Docker services
 	@echo "$(BLUE)Stopping Docker services...$(NC)"
 	@docker-compose down
+	@echo "$(GREEN)✓ Docker services stopped$(NC)"
 
 # Release (Changesets) targets
 changeset: ## Create a new changeset (interactive)
 	@echo "$(BLUE)Starting Changesets...$(NC)"
-	@bun x changeset
+	@npx changeset
 
-changeset-status: ## Show unreleased changes and version plan
-	@echo "$(BLUE)Changesets status (unreleased changes) ...$(NC)"
-	@bun x changeset status --verbose || true
+changeset-status: ## Show pending releases (concise)
+	@echo "$(BLUE)Changesets status (pending releases) ...$(NC)"
+	@npx changeset status || true
+
+changeset-status-verbose: ## Show full status incl. unchanged packages
+	@echo "$(BLUE)Changesets status (verbose, includes unchanged) ...$(NC)"
+	@npx changeset status --verbose || true
+
+changeset-status-json: ## Show status as JSON for tooling
+	@npx changeset status --output=json || true
+
+changeset-plan: ## Show only packages that will be released (name -> newVersion (type))
+	@echo "$(BLUE)Changesets release plan (changed packages only)...$(NC)"
+	@npx changeset status --output=json | jq -r 'if ([.releases[] | select(.type != "none")] | length) == 0 then "No packages will be released" else [.releases[] | select(.type != "none")][] | "\(.name) @ \(.oldVersion) -> \(.newVersion) (\(.type))" end'
+
+changeset-plan-one: ## Show release info for one package (usage: make changeset-plan-one PKG=@elysia-microservice/core)
+	@if [ -z "$(PKG)" ]; then \
+		echo "$(RED)Error: PKG is required. Example: make changeset-plan-one PKG=@elysia-microservice/core$(NC)"; \
+		exit 1; \
+	fi
+	@npx changeset status --output=json | jq -r --arg PKG "$(PKG)" '[.releases[] | select(.name == $PKG)] | if length == 0 then "No release planned for " + $PKG else .[] | "\(.name) @ \(.oldVersion) -> \(.newVersion) (\(.type))" end'
 
 release-version: ## Apply version bumps and update changelogs (changesets)
 	@echo "$(BLUE)Applying version changes with Changesets...$(NC)"
-	@bun x changeset version
+	@npx changeset version
 	@echo "$(BLUE)Updating lockfile...$(NC)"
 	@bun install
 	@echo "$(YELLOW)Reminder: commit the version changes before publishing$(NC)"
 
-release-publish: build test ## Publish all changed packages to npm (requires NPM_TOKEN)
-	@if [ -z "$$NPM_TOKEN" ]; then \
-		echo "$(RED)Error: NPM_TOKEN is not set in environment.$(NC)"; \
-		echo "$(YELLOW)Set it once in your shell: export NPM_TOKEN=...$(NC)"; \
-		exit 1; \
-	fi
-	@echo "$(BLUE)Publishing via Changesets...$(NC)"
-	@bun x changeset publish
-	@echo "$(GREEN)✓ Publish complete$(NC)"
+# AUTH_MODE?=cli
+# release-publish: build test ## Publish all changed packages to npm (requires NPM_TOKEN)
+# 	@if [ -z "$$NPM_TOKEN" and "$AUTH_MODE" === "token"]; then \
+# 		echo "$(RED)Error: NPM_TOKEN is not set in environment.$(NC)"; \
+# 		echo "$(YELLOW)Set it once in your shell: export NPM_TOKEN=...$(NC)"; \
+# 		exit 1; \
+# 	fi
+# 	@echo "$(BLUE)Publishing via Changesets...$(NC)"
+# 	@npx changeset publish
+# 	@echo "$(GREEN)✓ Publish complete$(NC)"
+
+# Default auth mode (can be overridden)
+NPM_AUTH_MODE?=cli
+export NPM_AUTH_MODE
+release-publish: build test ## Publish all changed packages to npm
+	@auth_mode="$(NPM_AUTH_MODE)"; \
+	if [ -n "$$CI" ]; then \
+		auth_mode="oidc"; \
+	fi; \
+	echo "Here $$NPM_AUTH_MODE n $$auth_mode"; \
+	auth_mode=$$(printf "%s" "$$auth_mode" | tr "[:upper:]" "[:lower:]"); \
+	echo "Here $$NPM_AUTH_MODE n $$auth_mode"; \
+	case "$$auth_mode" in \
+		cli|oidc) ;; \
+		token) \
+			if [ -z "$$NPM_TOKEN" ]; then \
+				echo "$(RED)Error: NPM_TOKEN is not set in environment.$(NC)"; \
+				echo "$(YELLOW)Set it once in your shell: export NPM_TOKEN=...$(NC)"; \
+				exit 1; \
+			fi ;; \
+		*) \
+			echo "$(RED)Error: Unknown NPM_AUTH_MODE '$$auth_mode'.$(NC)"; \
+			echo "$(YELLOW)Valid values: cli | token | oidc$(NC)"; \
+			exit 1 ;; \
+	esac; \
+	\
+	echo "$(BLUE)Publishing via Changesets (auth mode: $$auth_mode)...$(NC)"; \
+	npx changeset publish; \
+	echo "$(GREEN)✓ Publish complete$(NC)"
 
 release-local: ## Version + publish locally (version, install, build, publish)
 	@$(MAKE) release-version
@@ -427,7 +572,34 @@ changeset-add-one: ## Create a changeset for one package (usage: make changeset-
 	echo "" >> $$file; \
 	echo "$(MSG)" >> $$file; \
 	echo "$(GREEN)✓ Created $$file for $(PKG) ($(BUMP))$(NC)"
-	@echo "$(GREEN)✓ Docker services stopped$(NC)"
+
+changeset-add-all: ## Create changesets for ALL packages (usage: make changeset-add-all BUMP=patch MSG="fix: ...")
+	@if [ "$(BUMP)" != "patch" ] && [ "$(BUMP)" != "minor" ] && [ "$(BUMP)" != "major" ]; then \
+		echo "$(RED)Error: BUMP must be patch|minor|major$(NC)"; \
+		exit 1; \
+	fi
+	@msg="$(MSG)"; \
+	if [ -z "$$msg" ]; then \
+		msg="Release all packages"; \
+	fi; \
+	echo "$(BLUE)Creating changesets for ALL packages (BUMP=$(BUMP))...$(NC)"; \
+	mkdir -p .changeset; \
+	id=$$(date +%Y%m%d%H%M%S); \
+	count=0; \
+	for dir in packages/*; do \
+		if [ -f "$$dir/package.json" ]; then \
+			name=$$(jq -r '.name' $$dir/package.json); \
+			file=.changeset/$$(printf "%s-%03d" "$$id" $$count).md; \
+			echo "---" > $$file; \
+			echo "\"$$name\": $(BUMP)" >> $$file; \
+			echo "---" >> $$file; \
+			echo "" >> $$file; \
+			echo "$$msg" >> $$file; \
+			echo "  $(GREEN)✓$$file$$NC)"; \
+			count=$$((count + 1)); \
+		fi; \
+	done; \
+	echo "$(GREEN)✓ Created $$count changesets for all packages$(NC)"
 
 docker-logs: ## Show Docker service logs
 	@docker-compose logs -f

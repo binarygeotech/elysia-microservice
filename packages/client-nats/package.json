@@ -1,6 +1,6 @@
 {
   "name": "@elysia-microservice/client-nats",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "NATS client for Elysia microservices",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,12 @@
     "dev": "tsc --watch",
     "clean": "rm -rf dist"
   },
-  "keywords": ["elysia", "microservices", "nats", "client"],
+  "keywords": [
+    "elysia",
+    "microservices",
+    "nats",
+    "client"
+  ],
   "license": "MIT",
   "dependencies": {
     "@elysia-microservice/core": "workspace:*",

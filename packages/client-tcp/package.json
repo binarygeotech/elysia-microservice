@@ -1,6 +1,6 @@
 {
   "name": "@elysia-microservice/client-tcp",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "TCP client for Elysia microservices",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,12 @@
     "dev": "tsc --watch",
     "clean": "rm -rf dist"
   },
-  "keywords": ["elysia", "microservices", "tcp", "client"],
+  "keywords": [
+    "elysia",
+    "microservices",
+    "tcp",
+    "client"
+  ],
   "license": "MIT",
   "dependencies": {
     "@elysia-microservice/core": "workspace:*"

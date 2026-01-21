@@ -5,7 +5,10 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "bumpVersionsWithWorkspaceProtocolOnly": true,
+  "bumpVersionsWithWorkspaceProtocolOnly": false,
   "fixed": [],
-  "linked": []
+  "linked": [],
+  "ignore": [
+    "examples"
+  ]
 }
