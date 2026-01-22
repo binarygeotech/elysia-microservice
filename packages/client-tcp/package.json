@@ -1,6 +1,6 @@
 {
   "name": "@elysia-microservice/client-tcp",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "TCP client for Elysia microservices",
   "author": {
     "name": "Okojie George",

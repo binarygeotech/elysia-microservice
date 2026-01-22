@@ -1,5 +1,23 @@
 # @elysia-microservice/client-base
 
+## 0.1.4
+
+### Patch Changes
+
+- fix: workspace protocol conversion
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @elysia-microservice/client-kafka@0.1.4
+  - @elysia-microservice/client-nats@0.1.4
+  - @elysia-microservice/client-redis@0.1.4
+  - @elysia-microservice/client-tcp@0.1.4
+  - @elysia-microservice/client-tls@0.1.4
+  - @elysia-microservice/core@0.1.4
+
 ## 0.1.3
 
 ### Patch Changes

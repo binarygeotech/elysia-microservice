@@ -1,5 +1,11 @@
 # @elysia-microservice/core
 
+## 0.1.4
+
+### Patch Changes
+
+- fix: workspace protocol conversion
+
 ## 0.1.3
 
 ### Patch Changes

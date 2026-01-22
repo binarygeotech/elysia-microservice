@@ -1,5 +1,13 @@
 # @elysia-microservice/transport-tcp
 
+## 0.1.4
+
+### Patch Changes
+
+- fix: workspace protocol conversion
+- Updated dependencies
+  - @elysia-microservice/core@0.1.4
+
 ## 0.1.3
 
 ### Patch Changes

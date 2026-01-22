@@ -180,7 +180,7 @@ publish-dry: build test ## Dry run publish (test without actually publishing)
 	@for dir in packages/*; do \
 		if [ -f "$$dir/package.json" ]; then \
 			echo "Dry run: $$dir..."; \
-			cd $$dir && npm publish --dry-run --access public; \
+			cd $$dir && bun publish --dry-run --access public; \
 			cd ../..; \
 		fi \
 	done
@@ -193,7 +193,7 @@ publish: build test ## Publish all packages to npm
 		for dir in packages/*; do \
 			if [ -f "$$dir/package.json" ]; then \
 				echo "Publishing $$dir..."; \
-				cd $$dir && npm publish --access public; \
+				cd $$dir && bun publish --access public; \
 				cd ../..; \
 			fi \
 		done; \
@@ -204,88 +204,88 @@ publish: build test ## Publish all packages to npm
 
 publish-core: ## Publish only core package
 	@echo "$(BLUE)Publishing core package...$(NC)"
-	@cd packages/core && npm publish --access public
+	@cd packages/core && bun publish --access public
 	@echo "$(GREEN)✓ Core package published$(NC)"
 
 publish-utils: ## Publish only utils package
 	@echo "$(BLUE)Publishing utils package...$(NC)"
-	@cd packages/utils && npm publish --access public
+	@cd packages/utils && bun publish --access public
 	@echo "$(GREEN)✓ Utils package published$(NC)"
 
 publish-adapters: ## Publish only adapters package
 	@echo "$(BLUE)Publishing adapters package...$(NC)"
-	@cd packages/adapters && npm publish --access public
+	@cd packages/adapters && bun publish --access public
 	@echo "$(GREEN)✓ Adapters package published$(NC)"
 
 publish-transports: ## Publish all transport packages
 	@echo "$(BLUE)Publishing transport packages...$(NC)"
 	@for dir in packages/transport-*; do \
-		cd $$dir && npm publish --access public; \
+		cd $$dir && bun publish --access public; \
 		cd ../..; \
 	done
 	@echo "$(GREEN)✓ Transport packages published$(NC)"
 
 publish-transport-tcp: ## Publish TCP transport package
 	@echo "$(BLUE)Publishing TCP transport...$(NC)"
-	@cd packages/transport-tcp && npm publish --access public
+	@cd packages/transport-tcp && bun publish --access public
 	@echo "$(GREEN)✓ TCP transport published$(NC)"
 
 publish-transport-tls: ## Publish TLS transport package
 	@echo "$(BLUE)Publishing TLS transport...$(NC)"
-	@cd packages/transport-tls && npm publish --access public
+	@cd packages/transport-tls && bun publish --access public
 	@echo "$(GREEN)✓ TLS transport published$(NC)"
 
 publish-transport-nats: ## Publish NATS transport package
 	@echo "$(BLUE)Publishing NATS transport...$(NC)"
-	@cd packages/transport-nats && npm publish --access public
+	@cd packages/transport-nats && bun publish --access public
 	@echo "$(GREEN)✓ NATS transport published$(NC)"
 
 publish-transport-redis: ## Publish Redis transport package
 	@echo "$(BLUE)Publishing Redis transport...$(NC)"
-	@cd packages/transport-redis && npm publish --access public
+	@cd packages/transport-redis && bun publish --access public
 	@echo "$(GREEN)✓ Redis transport published$(NC)"
 
 publish-transport-kafka: ## Publish Kafka transport package
 	@echo "$(BLUE)Publishing Kafka transport...$(NC)"
-	@cd packages/transport-kafka && npm publish --access public
+	@cd packages/transport-kafka && bun publish --access public
 	@echo "$(GREEN)✓ Kafka transport published$(NC)"
 
 publish-clients: ## Publish all client packages
 	@echo "$(BLUE)Publishing client packages...$(NC)"
 	@for dir in packages/client-*; do \
-		cd $$dir && npm publish --access public; \
+		cd $$dir && bun publish --access public; \
 		cd ../..; \
 	done
 	@echo "$(GREEN)✓ Client packages published$(NC)"
 
 publish-client-base: ## Publish client-base package
 	@echo "$(BLUE)Publishing client-base...$(NC)"
-	@cd packages/client-base && npm publish --access public
+	@cd packages/client-base && bun publish --access public
 	@echo "$(GREEN)✓ Client-base published$(NC)"
 
 publish-client-tcp: ## Publish TCP client package
 	@echo "$(BLUE)Publishing TCP client...$(NC)"
-	@cd packages/client-tcp && npm publish --access public
+	@cd packages/client-tcp && bun publish --access public
 	@echo "$(GREEN)✓ TCP client published$(NC)"
 
 publish-client-tls: ## Publish TLS client package
 	@echo "$(BLUE)Publishing TLS client...$(NC)"
-	@cd packages/client-tls && npm publish --access public
+	@cd packages/client-tls && bun publish --access public
 	@echo "$(GREEN)✓ TLS client published$(NC)"
 
 publish-client-nats: ## Publish NATS client package
 	@echo "$(BLUE)Publishing NATS client...$(NC)"
-	@cd packages/client-nats && npm publish --access public
+	@cd packages/client-nats && bun publish --access public
 	@echo "$(GREEN)✓ NATS client published$(NC)"
 
 publish-client-redis: ## Publish Redis client package
 	@echo "$(BLUE)Publishing Redis client...$(NC)"
-	@cd packages/client-redis && npm publish --access public
+	@cd packages/client-redis && bun publish --access public
 	@echo "$(GREEN)✓ Redis client published$(NC)"
 
 publish-client-kafka: ## Publish Kafka client package
 	@echo "$(BLUE)Publishing Kafka client...$(NC)"
-	@cd packages/client-kafka && npm publish --access public
+	@cd packages/client-kafka && bun publish --access public
 	@echo "$(GREEN)✓ Kafka client published$(NC)"
 
 # Unpublish targets
@@ -444,6 +444,7 @@ release-version: ## Apply version bumps and update changelogs (changesets)
 	@npx changeset version
 	@echo "$(BLUE)Updating lockfile...$(NC)"
 	@bun install
+	@echo "$(YELLOW)Note: workspace:* will be converted to versions during publish$(NC)"
 	@echo "$(YELLOW)Reminder: commit the version changes before publishing$(NC)"
 
 # AUTH_MODE?=cli
@@ -457,34 +458,46 @@ release-version: ## Apply version bumps and update changelogs (changesets)
 # 	@npx changeset publish
 # 	@echo "$(GREEN)✓ Publish complete$(NC)"
 
+
+# Helper function to get packages that need publishing
+get-packages-to-publish:
+	@npx changeset status --output=json | jq -r '[.releases[] | select(.type != "none")] | .[] | .name'
+
 # Default auth mode (can be overridden)
-NPM_AUTH_MODE?=cli
-export NPM_AUTH_MODE
-release-publish: build test ## Publish all changed packages to npm
-	@auth_mode="$(NPM_AUTH_MODE)"; \
-	if [ -n "$$CI" ]; then \
-		auth_mode="oidc"; \
-	fi; \
-	echo "Here $$NPM_AUTH_MODE n $$auth_mode"; \
-	auth_mode=$$(printf "%s" "$$auth_mode" | tr "[:upper:]" "[:lower:]"); \
-	echo "Here $$NPM_AUTH_MODE n $$auth_mode"; \
-	case "$$auth_mode" in \
-		cli|oidc) ;; \
-		token) \
-			if [ -z "$$NPM_TOKEN" ]; then \
-				echo "$(RED)Error: NPM_TOKEN is not set in environment.$(NC)"; \
-				echo "$(YELLOW)Set it once in your shell: export NPM_TOKEN=...$(NC)"; \
-				exit 1; \
-			fi ;; \
-		*) \
-			echo "$(RED)Error: Unknown NPM_AUTH_MODE '$$auth_mode'.$(NC)"; \
-			echo "$(YELLOW)Valid values: cli | token | oidc$(NC)"; \
-			exit 1 ;; \
-	esac; \
+REGISTRY?=default
+release-publish: build test ## Publish changed packages using bun (native workspace:* stripping)
+	@registry="$(REGISTRY)"; \
+	registry=$$(printf "%s" "$$registry" | tr "[:upper:]" "[:lower:]"); \
 	\
-	echo "$(BLUE)Publishing via Changesets (auth mode: $$auth_mode)...$(NC)"; \
-	npx changeset publish; \
-	echo "$(GREEN)✓ Publish complete$(NC)"
+	echo "$(BLUE)Publishing packages using bun (workspace:* auto-stripped)...$(NC)"; \
+	failed=0; \
+	for dir in packages/*; do \
+		if [ -f "$$dir/package.json" ]; then \
+			pkg_name=$$(jq -r '.name' $$dir/package.json); \
+			pkg_version=$$(jq -r '.version' $$dir/package.json); \
+			published_version=$$(npm view "$$pkg_name@$$pkg_version" version 2>/dev/null || echo ""); \
+			if [ -z "$$published_version" ]; then \
+				echo "$(YELLOW)Publishing $$pkg_name@$$pkg_version...$(NC)"; \
+				if [ -z "$$registry" ]; then \
+					cd $$dir && bun publish --access public || { failed=1; cd ../..; break; }; \
+				else \
+					cd $$dir && bun publish --registry "$$registry" --access public || { failed=1; cd ../..; break; }; \
+				fi ;; \
+				cd ../..; \
+				echo "$(GREEN)✓ Published $$pkg_name@$$pkg_version$(NC)"; \
+			else \
+				echo "$(BLUE)  Skipping $$pkg_name@$$pkg_version (already published)$(NC)"; \
+			fi; \
+		fi; \
+	done; \
+	\
+	if [ $$failed -eq 0 ]; then \
+		echo "$(GREEN)✓ Publish complete - workspace:* automatically handled by bun$(NC)"; \
+		exit 0; \
+	else \
+		echo "$(RED)✗ Publish failed$(NC)"; \
+		exit 1; \
+	fi
 
 release-local: ## Version + publish locally (version, install, build, publish)
 	@$(MAKE) release-version
@@ -529,7 +542,7 @@ publish-one-dry: ## Dry run publish for a single package (usage: make publish-on
 		exit 1; \
 	fi; \
 	echo "$(YELLOW)Dry publishing $$dir...$(NC)"; \
-	cd $$dir && npm publish --dry-run --access public && echo "$(GREEN)✓ Dry publish ok $(NC)"
+	cd $$dir && bun publish --dry-run --access public && echo "$(GREEN)✓ Dry publish ok $(NC)"
 
 publish-one: ## Publish a single package to npm (usage: make publish-one PKG=@elysia-microservice/transport-tcp)
 	@if [ -z "$(PKG)" ]; then \
@@ -550,7 +563,7 @@ publish-one: ## Publish a single package to npm (usage: make publish-one PKG=@el
 		exit 1; \
 	fi; \
 	echo "$(BLUE)Publishing $$dir...$(NC)"; \
-	cd $$dir && npm publish --access public && echo "$(GREEN)✓ Published $(PKG)$(NC)"
+	cd $$dir && bun publish --access public && echo "$(GREEN)✓ Published $(PKG)$(NC)"
 
 BUMP?=patch
 MSG?=Release $(PKG)
