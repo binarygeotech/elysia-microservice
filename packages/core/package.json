@@ -1,6 +1,6 @@
 {
   "name": "@elysia-microservice/core",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Core functionality for Elysia microservices framework",
   "author": {
     "name": "Okojie George",

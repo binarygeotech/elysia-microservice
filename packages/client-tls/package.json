@@ -1,6 +1,6 @@
 {
   "name": "@elysia-microservice/client-tls",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "TLS client for Elysia microservices",
   "author": {
     "name": "Okojie George",

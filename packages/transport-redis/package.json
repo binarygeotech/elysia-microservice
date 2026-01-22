@@ -1,6 +1,6 @@
 {
   "name": "@elysia-microservice/transport-redis",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Redis transport for Elysia microservices",
   "author": {
     "name": "Okojie George",

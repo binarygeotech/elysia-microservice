@@ -1,6 +1,6 @@
 {
   "name": "@elysia-microservice/transport-tcp",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "TCP transport for Elysia microservices",
   "author": {
     "name": "Okojie George",

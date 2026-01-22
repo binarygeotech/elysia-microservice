@@ -1,6 +1,6 @@
 {
   "name": "@elysia-microservice/adapters",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Adapters for integrating Elysia microservices with other frameworks",
   "author": {
     "name": "Okojie George",

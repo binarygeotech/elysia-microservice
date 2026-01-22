@@ -1,5 +1,13 @@
 # @elysia-microservice/transport-kafka
 
+## 0.1.5
+
+### Patch Changes
+
+- chore(release): Fixed release publishing flow with bun publish
+- Updated dependencies
+  - @elysia-microservice/core@0.1.5
+
 ## 0.1.4
 
 ### Patch Changes

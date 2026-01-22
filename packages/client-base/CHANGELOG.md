@@ -1,5 +1,23 @@
 # @elysia-microservice/client-base
 
+## 0.1.5
+
+### Patch Changes
+
+- chore(release): Fixed release publishing flow with bun publish
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @elysia-microservice/client-kafka@0.1.5
+  - @elysia-microservice/client-nats@0.1.5
+  - @elysia-microservice/client-redis@0.1.5
+  - @elysia-microservice/client-tcp@0.1.5
+  - @elysia-microservice/client-tls@0.1.5
+  - @elysia-microservice/core@0.1.5
+
 ## 0.1.4
 
 ### Patch Changes
