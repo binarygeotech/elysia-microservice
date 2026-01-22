@@ -1,6 +1,6 @@
 {
   "name": "@elysia-microservice/base",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "private": true,
   "description": "Transport-agnostic microservices for Elysia with NestJS TCP compatibility - Monorepo",
   "keywords": ["elysia", "microservices", "tcp", "tls", "nats", "redis", "kafka", "nestjs"],
