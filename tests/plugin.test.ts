@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import { Elysia } from "elysia";
-import { Microservice } from "../packages/core/dist/plugin.js";
-import { createTcpClient } from "../packages/client-tcp/dist/tcp.js";
+import { Microservice } from "../packages/core/src/plugin.js";
+import { createTcpClient } from "../packages/client-tcp/src/tcp.js";
 
 describe("Microservice Plugin - Standalone Mode", () => {
   let app: any;

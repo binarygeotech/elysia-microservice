@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll } from "bun:test";
 import { Elysia } from "elysia";
-import { Microservice } from "../packages/core/dist/plugin.js";
-import { createTcpClient } from "../packages/client-tcp/dist/tcp.js";
-import { createTlsClient } from "../packages/client-tls/dist/tls.js";
+import { Microservice } from "../packages/core/src/plugin.js";
+import { createTcpClient } from "../packages/client-tcp/src/tcp.js";
+import { createTlsClient } from "../packages/client-tls/src/tls.js";
 
 describe("TCP Transport", () => {
     let app: any;

@@ -1,4 +1,4 @@
-import type { Context, ElysiaInstance } from "elysia";
+import type { ElysiaInstance } from "elysia";
 
 export type TransportType = "tcp" | "tls" | "redis" | "nats" | "kafka";
 
@@ -6,6 +6,49 @@ export interface BaseTransportOptions {
   port?: number;
   host?: string;
 }
+
+export interface TcpTransportOptions extends BaseTransportOptions {}
+
+export interface TlsTransportOptions extends BaseTransportOptions {
+  key: string | Buffer;
+  cert: string | Buffer;
+  ca?: string | Buffer;
+  requestCert?: boolean;
+  rejectUnauthorized?: boolean;
+}
+
+export interface RedisTransportOptions {
+  url?: string;
+  username?: string;
+  password?: string;
+  db?: number;
+  tls?: boolean;
+}
+
+export interface NatsTransportOptions {
+  url?: string;
+  servers?: string[];
+  user?: string;
+  pass?: string;
+  token?: string;
+  reconnect?: boolean;
+  maxReconnectAttempts?: number;
+}
+
+export interface KafkaTransportOptions {
+  brokers: string[];
+  groupId?: string;
+  clientId?: string;
+}
+
+export type TransportOptions =
+  | TcpTransportOptions
+  | TlsTransportOptions
+  | RedisTransportOptions
+  | NatsTransportOptions
+  | KafkaTransportOptions;
+
+export interface MicroserviceHybridOptions extends BaseTransportOptions {}
 
 export interface ServiceEndpoint {
   host?: string;
@@ -15,7 +58,7 @@ export interface ServiceEndpoint {
 
 export interface MicroserviceTransportOption {
   transport: TransportType;
-  options?: any;
+  options?: TransportOptions;
 }
 
 export interface MicroserviceClientOption extends MicroserviceTransportOption {

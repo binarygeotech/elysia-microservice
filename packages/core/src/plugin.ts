@@ -1,7 +1,7 @@
 // import { createRegistry } from "./registry";
 import { createRegistry } from "./patterns/registry";
 import { enableGracefulShutdown } from "./shutdown";
-import type { Hooks, MicroserviceConfig, MessageContext } from "./types";
+import type { Hooks, MicroserviceConfig, MessageContext, TcpTransportOptions, TlsTransportOptions, RedisTransportOptions, NatsTransportOptions, KafkaTransportOptions } from "./types";
 import type { Elysia, ElysiaInstance } from "elysia";
 
 // Type augmentation for Elysia decorators
@@ -108,31 +108,31 @@ export function Microservice(config: MicroserviceConfig) {
             case "tcp": {
               // @ts-ignore - Dynamic import resolved at runtime
               const { createTcpTransport } = await import("@elysia-microservice/transport-tcp");
-              server = createTcpTransport(registry, config.server.options);
+              server = createTcpTransport(registry, config.server.options as TcpTransportOptions);
               break;
             }
             case "tls": {
               // @ts-ignore - Dynamic import resolved at runtime
               const { createTlsTransport } = await import("@elysia-microservice/transport-tls");
-              server = createTlsTransport(registry, config.server.options);
+              server = createTlsTransport(registry, config.server.options as TlsTransportOptions);
               break;
             }
             case "redis": {
               // @ts-ignore - Dynamic import resolved at runtime
               const { createRedisTransport } = await import("@elysia-microservice/transport-redis");
-              server = await createRedisTransport(registry, config.server.options);
+              server = await createRedisTransport(registry, config.server.options as RedisTransportOptions);
               break;
             }
             case "nats": {
               // @ts-ignore - Dynamic import resolved at runtime
               const { createNatsTransport } = await import("@elysia-microservice/transport-nats");
-              server = await createNatsTransport(registry, config.server.options);
+              server = await createNatsTransport(registry, config.server.options as NatsTransportOptions);
               break;
             }
             case "kafka": {
               // @ts-ignore - Dynamic import resolved at runtime
               const { createKafkaTransport } = await import("@elysia-microservice/transport-kafka");
-              server = await createKafkaTransport(registry, config.server.options);
+              server = await createKafkaTransport(registry, config.server.options as KafkaTransportOptions);
               break;
             }
             default:

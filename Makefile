@@ -482,7 +482,7 @@ release-publish: build test ## Publish changed packages using bun (native worksp
 					cd $$dir && bun publish --access public || { failed=1; cd ../..; break; }; \
 				else \
 					cd $$dir && bun publish --registry "$$registry" --access public || { failed=1; cd ../..; break; }; \
-				fi ;; \
+				fi; \
 				cd ../..; \
 				echo "$(GREEN)✓ Published $$pkg_name@$$pkg_version$(NC)"; \
 			else \
