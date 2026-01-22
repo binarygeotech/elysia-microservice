@@ -1,5 +1,13 @@
 # @elysia-microservice/utils
 
+## 0.1.3
+
+### Patch Changes
+
+- a5f3890: Fixing dependencies version on release with changeset
+- Updated dependencies [a5f3890]
+  - @elysia-microservice/core@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes
