@@ -1,5 +1,27 @@
 # @elysia-microservice/client-base
 
+## 0.1.6
+
+### Patch Changes
+
+- ## NestJS-Style Decorators & Adapter Refactor
+
+  - **New**: Added parameter decorators `@Payload()`, `@Ctx()`, and `@App()` for handler parameter injection
+  - **New**: Support for Observable-backed event handlers for reactive event processing
+  - **New**: Benchmark suite comparing Elysia microservices vs NestJS (echo servers + load generator)
+  - **Changed**: Refactored adapter architecture from functional `adaptNestMessages()` to declarative plugin-style with `adapters` config option
+  - **Fixed**: Decorator binding issues in stage-3 TypeScript decorators (legacy + stage-3 support)
+  - **Fixed**: Event handlers now properly execute with parameter injection via metadata system
+  - **Docs**: Updated README and adapters documentation with new decorator examples and usage patterns
+
+- Updated dependencies
+  - @elysia-microservice/core@0.2.0
+  - @elysia-microservice/client-tcp@0.1.6
+  - @elysia-microservice/client-tls@0.1.6
+  - @elysia-microservice/client-nats@0.1.6
+  - @elysia-microservice/client-redis@0.1.6
+  - @elysia-microservice/client-kafka@0.1.6
+
 ## 0.1.5
 
 ### Patch Changes
