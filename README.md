@@ -33,6 +33,7 @@
 - 🛡️ **Resilience** - Circuit breaker, retries, and timeouts
 - 🎭 **Chaos Engineering** - Inject failures and latency for testing
 - 🔗 **NestJS Compatible** - Use NestJS decorators with Elysia
+- 🧩 **Parameter Decorators** - `@Payload()`, `@Ctx()`, and `@App()` for handler injection
 - 📊 **Connection Pooling** - Automatic client pooling with failover
 - 🪝 **Lifecycle Hooks** - onBefore/onAfter hooks for cross-cutting concerns
 - 🏥 **Health Checks** - Built-in health and readiness endpoints (hybrid mode)
@@ -186,6 +187,59 @@ All handlers receive a structured context:
 ```
 
 ---
+
+## 🧭 NestJS-Style Decorators (Adapters)
+
+### Microservice options (including adapters)
+
+```typescript
+const app = new Elysia()
+  .use(Microservice({
+    hybrid: true,
+    server: { transport: 'tcp', options: { port: 4000 } },
+    clients: {},
+    adapters: [
+      {
+        class: NestAdapter,
+        initializer: (adapter, registry) => {
+          adapter.init(registry, new UserController());
+        },
+      },
+    ],
+  }));
+```
+
+Adapters let you register controller classes once, each adapter can optionally receive an `initializer` to wire controllers.
+
+Use the Nest adapter with familiar method decorators and parameter injections:
+- Method decorators: `@MessagePattern()` (request/response), `@EventPattern()` (fire-and-forget)
+- Parameter decorators: `@Payload()`, `@Ctx()`, `@App()`
+
+```typescript
+import { MessagePattern, EventPattern, Payload, Ctx, App } from '@elysia-microservice/core';
+import type { MicroserviceContext } from '@elysia-microservice/core';
+import type { ElysiaInstance } from 'elysia';
+import { from, Observable } from 'rxjs';
+
+class UserController {
+  @MessagePattern('user.get')
+  getUser(
+    @Payload('id') id: number,
+    @Ctx() ctx: MicroserviceContext,
+    @App() app: ElysiaInstance
+  ) {
+    app.log?.info?.(`Request trace: ${ctx.traceId}`);
+    return { id, name: 'John Doe' };
+  }
+
+  // Event handler can also return an Observable stream
+  @EventPattern('user.activity')
+  activityStream(): Observable<number> {
+    return from([1, 2, 3]);
+  }
+}
+```
+
 
 ## 🔌 Supported Transports
 

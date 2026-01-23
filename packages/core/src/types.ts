@@ -1,4 +1,5 @@
 import type { ElysiaInstance } from "elysia";
+import type { AdapterConfig } from "./adapters";
 
 export type TransportType = "tcp" | "tls" | "redis" | "nats" | "kafka";
 
@@ -82,6 +83,7 @@ export interface MicroserviceConfig {
   server?: MicroserviceTransportOption;
   clients?: Record<string, MicroserviceClientOption>;
   hybrid?: boolean;
+  adapters?: AdapterConfig[];
 }
 
 export type MaybePromise<T> = T | Promise<T>

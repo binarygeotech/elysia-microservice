@@ -12,7 +12,7 @@ async function testPatternMatching() {
 
   try {
     // Test 1: Exact match
-    console.log("1️⃣ Testing exact match: auth.login");
+    console.log("1 Testing exact match: auth.login");
     const loginResult = await client.send("auth.login", { 
       username: "alice", 
       password: "secret123" 
@@ -20,7 +20,7 @@ async function testPatternMatching() {
     console.log("   Result:", loginResult, "\n");
 
     // Test 2: Wildcard patterns (users.*)
-    console.log("2️⃣ Testing wildcard pattern: users.*");
+    console.log("2 Testing wildcard pattern: users.*");
     
     const createResult = await client.send("users.created", { 
       userId: "user123", 
@@ -40,7 +40,7 @@ async function testPatternMatching() {
     console.log("   users.deleted:", deleteResult, "\n");
 
     // Test 3: Regex patterns (order.\d+)
-    console.log("3️⃣ Testing regex pattern: /^order\\.[0-9]+$/");
+    console.log("3 Testing regex pattern: /^order\\.[0-9]+$/");
     
     const order1 = await client.send("order.123", { 
       items: ["item1", "item2"], 
@@ -55,14 +55,14 @@ async function testPatternMatching() {
     console.log("   order.456:", order2, "\n");
 
     // Test 4: Catchall handler (unmatched pattern)
-    console.log("4️⃣ Testing catchall handler: unknown.pattern");
+    console.log("4 Testing catchall handler: unknown.pattern");
     const unknownResult = await client.send("unknown.pattern", { 
       data: "this should be caught by catchall" 
     });
     console.log("   Result:", unknownResult, "\n");
 
     // Test 5: Event patterns (fire and forget)
-    console.log("5️⃣ Testing event patterns");
+    console.log("5 Testing event patterns");
     
     await client.emit("notifications.email", { 
       to: "alice@example.com", 

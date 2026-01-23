@@ -2,7 +2,7 @@
 import { createRegistry } from "./patterns/registry";
 import { enableGracefulShutdown } from "./shutdown";
 import type { Hooks, MicroserviceConfig, MessageContext, TcpTransportOptions, TlsTransportOptions, RedisTransportOptions, NatsTransportOptions, KafkaTransportOptions } from "./types";
-import type { Elysia, ElysiaInstance } from "elysia";
+import type { ElysiaInstance } from "elysia";
 
 // Type augmentation for Elysia decorators
 declare module "elysia" {
@@ -165,6 +165,18 @@ export function Microservice(config: MicroserviceConfig) {
               client = cfg.chaos ? withChaos(client, cfg.chaos) : client;
 
               registry.registerClient(name, client);
+            }
+          }
+        }
+
+        // Initialize adapters
+        if (config.adapters && config.adapters.length > 0) {
+          for (const adapterConfig of config.adapters) {
+            const adapter = new adapterConfig.class();
+            if (adapterConfig.initializer) {
+              await adapterConfig.initializer(adapter, registry);
+            } else {
+              await adapter.init(registry);
             }
           }
         }
