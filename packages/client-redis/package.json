@@ -1,6 +1,6 @@
 {
   "name": "@elysia-microservice/client-redis",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Redis client for Elysia microservices",
   "author": {
     "name": "Okojie George",

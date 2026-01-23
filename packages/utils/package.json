@@ -1,6 +1,6 @@
 {
   "name": "@elysia-microservice/utils",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Utilities for Elysia microservices (discovery, load balancing, client pool, chaos)",
   "author": {
     "name": "Okojie George",
