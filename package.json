@@ -7,7 +7,7 @@
   "license": "MIT",
   "workspaces": [
     "packages/*",
-    "examples"
+    "examples/*"
   ],
   "scripts": {
     "build": "bun run build:core && bun run build:utils && bun run build:transports && bun run build:clients && bun run build:client-base && bun run build:adapters",

@@ -1,0 +1,24 @@
+{
+  "name": "elysia-microservice-bench",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "elysia": "bun elysia-echo.ts",
+    "nest": "cd nest-echo && bun install && bun run start",
+    "bench:elysia": "bun run-bench.ts --target=elysia --concurrency=100 --duration=30",
+    "bench:nest": "bun run-bench.ts --target=nest --concurrency=100 --duration=30",
+    "bench": "bun run-bench.ts --target=elysia --concurrency=100 --duration=30"
+  },
+  "dependencies": {
+    "@elysia-microservice/core": "workspace:*",
+    "@elysia-microservice/adapters": "workspace:*",
+    "@elysia-microservice/transport-tcp": "workspace:*",
+    "@elysia-microservice/client-tcp": "workspace:*",
+    "@nestjs/microservices": "^10.0.0",
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0",
+    "rxjs": "^7.8.1",
+    "reflect-metadata": "^0.2.1",
+    "elysia": "latest"
+  }
+}
