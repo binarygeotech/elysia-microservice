@@ -21,21 +21,31 @@ export function createTcpClient(options: TcpClientOptions = {}) {
       const msg = decode(buffer.subarray(0, size + 4))
       buffer = buffer.subarray(size + 4)
       if (msg.id && pending.has(msg.id)) {
-        pending.get(msg.id)!(msg.response)
+        pending.get(msg.id)!(msg)
         pending.delete(msg.id)
       }
     }
   })
 
   return {
-    async send(pattern: string, data: any) {
+    async send(pattern: string, data: any, options?: { meta?: any }) {
       const id = randomUUID()
-      socket.write(encode({ id, pattern, data, isEvent: false }))
-      return new Promise(resolve => pending.set(id, resolve))
+      socket.write(encode({ id, pattern, data, meta: options?.meta, isEvent: false }))
+      return new Promise((resolve, reject) => {
+        pending.set(id, (msg: any) => {
+          if (msg?.error) {
+            reject(new Error(msg.error))
+          } else if (msg?.response !== undefined) {
+            resolve(msg.response)
+          } else {
+            resolve(msg)
+          }
+        })
+      })
     },
 
-    async emit(pattern: string, data: any) {
-      socket.write(encode({ pattern, data, isEvent: true }))
+    async emit(pattern: string, data: any, options?: { meta?: any }) {
+      socket.write(encode({ pattern, data, meta: options?.meta, isEvent: true }))
     },
 
     async close() {

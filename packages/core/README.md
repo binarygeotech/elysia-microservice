@@ -8,7 +8,8 @@ Core functionality for the Elysia microservices framework including the Microser
 - **📝 Registry System**: Register message handlers, event handlers, and clients
 - **📡 Protocol**: Frame encoding/decoding for message passing
 - **🎯 Patterns**: Decorators for message and event patterns
-- **🔄 Context Management**: Request context handling
+- **🛡️ Guards & Middleware**: Hierarchical DI system (global, group, handler scopes)
+- **🔄 Context Management**: Request context handling with metadata support
 - **🛑 Graceful Shutdown**: Handle process termination gracefully
 - **📊 Tracing**: Tracing interface for observability
 - **🔀 Two Modes**: Plugin mode (hybrid HTTP + microservice) or standalone mode
@@ -142,6 +143,7 @@ interface MicroserviceConfig {
 When you use the plugin, your Elysia app gets these methods:
 
 ```typescript
+// Lifecycle
 app.microservice.start()         // Manually start microservice
 app.microservice.stop()          // Stop microservice
 app.microservice.awaitReady()    // Wait until ready
@@ -152,9 +154,92 @@ app.microservice.server          // Access the server
 app.microservice.clients         // Access clients
 app.microservice.clientProxy(name, schema) // Create typed client
 
+// Handlers
 app.onMsMessage(pattern, handler) // Register message handler
 app.onMsEvent(pattern, handler)   // Register event handler
+
+// Guards & Middleware (DI System)
+app.msGuard(guard)               // Add global guard
+app.msMiddleware(middleware)      // Add global middleware
+app.msGroup(prefix)              // Create scoped group (returns builder)
+  .msGuard(guard)                // Add group guard
+  .msMiddleware(middleware)      // Add group middleware
 ```
+
+## Guards & Middleware
+
+Use the hierarchical DI system for authorization, validation, and cross-cutting concerns:
+
+### Global Guard (Authentication)
+
+```typescript
+app.msGuard(async (ctx) => {
+  const token = (ctx.meta as any)?.token;
+  if (!token || !isValidToken(token)) {
+    throw new Error('Unauthorized');
+  }
+});
+```
+
+### Global Middleware (Request Enrichment)
+
+```typescript
+app.msMiddleware({
+  onBefore: async (ctx) => {
+    const user = await decodeToken((ctx.meta as any)?.token);
+    return { user, userId: user?.id };
+  },
+  onAfter: async (ctx, response) => {
+    console.log(`[${(ctx as any).userId}] ${ctx.pattern} completed`);
+  }
+});
+```
+
+### Group Scopes (Role-Based Access)
+
+```typescript
+// Protect all admin.* patterns
+const adminGroup = app.msGroup('admin.*');
+adminGroup.msGuard(async (ctx) => {
+  const role = (ctx.meta as any)?.role;
+  if (role !== 'admin') {
+    throw new Error('Forbidden: Admin only');
+  }
+});
+
+// Protect all users.* patterns
+const userGroup = app.msGroup('users.*');
+userGroup.msGuard(async (ctx) => {
+  const role = (ctx.meta as any)?.role;
+  if (!['admin', 'user'].includes(role)) {
+    throw new Error('Forbidden: Invalid role');
+  }
+});
+```
+
+### Passing Metadata
+
+Metadata flows through guards, middleware, and handlers:
+
+```typescript
+// Client sends metadata
+const result = await client.send(
+  'users.get',
+  { id: 1 },
+  { meta: { token: 'jwt-token', role: 'admin' } }
+);
+
+// Server receives it in guards/middleware/handlers
+.msGuard(async (ctx) => {
+  console.log('Guard sees:', ctx.meta); // { token, role }
+})
+.onMsMessage('users.get', (ctx) => {
+  console.log('Handler sees:', ctx.meta);
+  return { id: 1 };
+});
+```
+
+**See [Advanced Features](../../docs/guides/advanced-features.md#guards--middleware-di-system) for more details and patterns.**
 
 ## With Clients
 

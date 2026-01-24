@@ -23,14 +23,14 @@ export function createTcpTransport(registry: any, options: TcpTransportOptions =
       const ctx = createContext(socket, packet)
       if (packet.isEvent) {
         try {
-          await registry.resolveAndRunEvent(packet.pattern, packet.data, { meta: ctx })
+          await registry.resolveAndRunEvent(packet.pattern, packet.data, { meta: packet.meta, store: ctx })
         } catch (e: any) {
           console.warn(`[TCP Transport] Error handling event pattern: ${packet.pattern}`, e.message)
         }
         return
       }
       try {
-        const result = await registry.resolveAndRunRequest(packet.pattern, packet.data, { meta: ctx })
+        const result = await registry.resolveAndRunRequest(packet.pattern, packet.data, { meta: packet.meta, store: ctx })
         socket.write(encode({ id: packet.id, response: result }))
       } catch (e: any) {
         socket.write(encode({ id: packet.id, error: e?.message ?? "Unknown error" }))

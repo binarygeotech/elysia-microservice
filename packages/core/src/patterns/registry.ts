@@ -1,6 +1,6 @@
 import type { ElysiaInstance, Handler } from "elysia"
 import { PatternMatcher } from "./matcher"
-import { Hooks, MessageContext, MessageFallbackHandler, MessageHandler } from "../types"
+import { Hooks, MessageContext, MessageFallbackHandler, MessageHandler, GuardFunction, Middleware, GroupBuilder } from "../types"
 
 /** Registry for requests/events/clients */
 export function createRegistry() {
@@ -43,6 +43,24 @@ export function createRegistry() {
             (requests.onError = fn),
         setEventErrorHandler: (fn: (err: unknown, ctx?: MessageContext<any, ElysiaInstance>) => void | Promise<void>) =>
             (events.onError = fn),
+
+        // Guard methods
+        msGuard: (guard: GuardFunction<ElysiaInstance>, target: 'request' | 'event' = 'request') => {
+            if (target === 'request') requests.addGlobalGuard(guard)
+            else events.addGlobalGuard(guard)
+        },
+
+        // Middleware methods
+        msMiddleware: (middleware: Middleware<ElysiaInstance>, target: 'request' | 'event' = 'request') => {
+            if (target === 'request') requests.addGlobalMiddleware(middleware)
+            else events.addGlobalMiddleware(middleware)
+        },
+
+        // Group methods
+        msGroup: (prefix: string, target: 'request' | 'event' = 'request'): GroupBuilder<ElysiaInstance> => {
+            if (target === 'request') return requests.createGroup(prefix)
+            else return events.createGroup(prefix)
+        },
 
         registerClient: (name: string, client: any) => clients.set(name, client),
 

@@ -26,6 +26,8 @@
 - 🔌 **Plugin Mode** - Seamless integration with Elysia (HTTP + Microservice)
 - ⚡ **Standalone Mode** - Pure microservice applications without HTTP
 - 🎯 **Advanced Pattern Matching** - Wildcards (`user.*`), regex, and catchall handlers
+- 🛡️ **Guards & Middleware** - Hierarchical DI system with global, group, and handler scopes
+- 🎭 **Middleware & Guards** - Authorization guards, request enrichment middleware, cross-cutting concerns
 - 🔀 **Transport Agnostic** - Support for TCP, TLS, NATS, Redis, and Kafka
 - 📦 **Modular** - Install only what you need, tree-shakable bundles
 - 🔄 **Service Discovery** - Static and DNS-based service discovery
@@ -214,6 +216,16 @@ Adapters let you register controller classes once, each adapter can optionally r
 Use the Nest adapter with familiar method decorators and parameter injections:
 - Method decorators: `@MessagePattern()` (request/response), `@EventPattern()` (fire-and-forget)
 - Parameter decorators: `@Payload()`, `@Ctx()`, `@App()`
+
+To use decorators, update the following in your `tsconfig.json` file:
+```typescript
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true   // optional, but common with Nest-style decorators
+  }
+}
+```
 
 ```typescript
 import { MessagePattern, EventPattern, Payload, Ctx, App } from '@elysia-microservice/core';

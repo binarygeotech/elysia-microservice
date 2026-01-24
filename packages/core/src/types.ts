@@ -131,10 +131,33 @@ export interface Hooks<Instance extends ElysiaInstance = ElysiaInstance> {
 }
 
 /** Microservice handler entry */
-export interface Entry<HandlerType = any> {
+export interface Entry<HandlerType = any, Instance extends ElysiaInstance = ElysiaInstance> {
   pattern: string
   handler: HandlerType
   regex?: RegExp
   score: number
-  hooks?: Hooks<ElysiaInstance>
+  hooks?: Hooks<Instance>
+  middleware?: Middleware<Instance>[]
+}
+
+/** Guard function - can only block/throw, no data enrichment */
+export type GuardFunction<Instance extends ElysiaInstance = ElysiaInstance> = (
+  ctx: MessageContext<unknown, Instance>
+) => MaybePromise<void>
+
+/** Middleware function - can block, enrich context, and add side effects */
+export interface Middleware<Instance extends ElysiaInstance = ElysiaInstance> {
+  /** Called before handler execution - can enrich context or block */
+  onBefore?: (ctx: MessageContext<unknown, Instance>) => MaybePromise<void | { [key: string]: any }>
+  /** Called after handler execution - for side effects, always runs */
+  onAfter?: (ctx: MessageContext<unknown, Instance>, response: unknown) => MaybePromise<void>
+}
+
+/** Group builder for scoped middleware/guards */
+export interface GroupBuilder<Instance extends ElysiaInstance = ElysiaInstance> {
+  prefix: string
+  guards: GuardFunction<Instance>[]
+  middleware: Middleware<Instance>[]
+  msGuard(guard: GuardFunction<Instance>): this
+  msMiddleware(middleware: Middleware<Instance>): this
 }

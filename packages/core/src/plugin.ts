@@ -1,7 +1,7 @@
 // import { createRegistry } from "./registry";
 import { createRegistry } from "./patterns/registry";
 import { enableGracefulShutdown } from "./shutdown";
-import type { Hooks, MicroserviceConfig, MessageContext, TcpTransportOptions, TlsTransportOptions, RedisTransportOptions, NatsTransportOptions, KafkaTransportOptions } from "./types";
+import type { Hooks, MicroserviceConfig, MessageContext, TcpTransportOptions, TlsTransportOptions, RedisTransportOptions, NatsTransportOptions, KafkaTransportOptions, GuardFunction, Middleware, GroupBuilder } from "./types";
 import type { ElysiaInstance } from "elysia";
 
 // Type augmentation for Elysia decorators
@@ -38,7 +38,15 @@ declare module "elysia" {
     onMsCatchallEvent(handler: (pattern: string, ctx?: MessageContext<any, ElysiaInstance>) => void): this;
 
     onMsError(handler: (err: unknown, ctx?: MessageContext<any, ElysiaInstance>) => void | Promise<void>): this;
-    msMiddleware(middleware: Hooks): this;
+    
+    /** Add a global message guard */
+    msGuard(guard: GuardFunction<ElysiaInstance>): this;
+    
+    /** Add a global message middleware */
+    msMiddleware(middleware: Middleware<ElysiaInstance> | Hooks): this;
+    
+    /** Create a scoped message group with prefix-based guards/middleware */
+    msGroup(prefix: string): GroupBuilder<ElysiaInstance>;
   }
 }
 
@@ -257,9 +265,29 @@ export function Microservice(config: MicroserviceConfig) {
       return this;
     };
 
-    app.msMiddleware = function (middlewares: Hooks) {
-      registry.setRequestHooks(middlewares)
+    app.msGuard = function (guard: GuardFunction<ElysiaInstance>) {
+      registry.msGuard(guard, 'request');
       return this;
+    };
+
+    app.msMiddleware = function (middleware: Middleware<ElysiaInstance> | Hooks) {
+      // Support both Middleware and legacy Hooks
+      if ('onBefore' in middleware || 'onAfter' in middleware) {
+        // Check if it's Middleware (has onBefore/onAfter as functions)
+        if (typeof (middleware as any).onBefore === 'function' || typeof (middleware as any).onAfter === 'function') {
+          registry.msMiddleware(middleware as Middleware<ElysiaInstance>, 'request');
+        } else {
+          // Legacy Hooks format
+          registry.setRequestHooks(middleware as Hooks);
+        }
+      } else {
+        registry.setRequestHooks(middleware as Hooks);
+      }
+      return this;
+    };
+
+    app.msGroup = function (prefix: string) {
+      return registry.msGroup(prefix, 'request');
     };
 
     // Add catchall methods

@@ -14,11 +14,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - LICENSE file (MIT)
 - Makefile for streamlined build, test, and publish operations
 - Documentation organization in docs/ directory structure
+- **DI System: Guards & Middleware**
+  - Hierarchical authorization & middleware system with three scopes: global, group, and handler
+  - `msGuard()` for authorization-only checks (can only throw)
+  - `msMiddleware()` for cross-cutting concerns (can block + enrich context)
+  - `msGroup(prefix)` for creating pattern-prefix-scoped guards/middleware
+  - Metadata support throughout client send/emit and all transports (TCP, TLS, NATS, Redis, Kafka)
+  - Proper execution order: Guards → Middleware.onBefore → Handler → Middleware.onAfter
+  - Guard/middleware enrichment flows through entire handler context
+- Comprehensive DI system tests covering guards, middleware, groups, and execution order
 
 ### Changed
 - Reorganized documentation into logical directories (guides/, api/, contributing/)
 - Updated README.md with professional formatting, badges, and clear navigation
 - Moved architecture and migration guides to docs/ directory
+- Updated advanced-features.md with extensive Guards & Middleware section and examples
+- Updated core package README with DI system examples
+- Enhanced main README with Guards & Middleware feature highlight
 
 ### Removed
 - Temporary development markdown files from root directory
