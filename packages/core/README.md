@@ -8,7 +8,7 @@ Core functionality for the Elysia microservices framework including the Microser
 - **📝 Registry System**: Register message handlers, event handlers, and clients
 - **📡 Protocol**: Frame encoding/decoding for message passing
 - **🎯 Patterns**: Decorators for message and event patterns
-- **� Guards & Middleware**: Hierarchical DI system (global, group, handler scopes)
+- **🛡️ Guards & Middleware**: Hierarchical DI system (global, group, handler scopes)
 - **🔄 Context Management**: Request context handling with metadata support
 - **🛑 Graceful Shutdown**: Handle process termination gracefully
 - **📊 Tracing**: Tracing interface for observability
