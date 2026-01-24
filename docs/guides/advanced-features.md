@@ -181,6 +181,246 @@ registry.setEventErrorHandler(async (error, ctx) => {
 });
 ```
 
+## Guards & Middleware (DI System)
+
+The framework provides a hierarchical Dependency Injection system for cross-cutting concerns: **Guards** (authorization only), **Middleware** (can block + enrich context), and **Groups** (scoped to pattern prefixes).
+
+### Guards vs Middleware
+
+**Guards** - Authorization only, can only throw:
+- Used for access control and permission checks
+- Cannot modify context
+- Any guard can block the entire request
+
+**Middleware** - Cross-cutting concerns, can block and enrich:
+- Used for logging, metrics, request enrichment
+- Can add data to context via `onBefore`
+- Has both `onBefore` and `onAfter` phases
+- `onAfter` always runs, even on handler error
+
+### Global Guards
+
+Add guards that apply to all handlers:
+
+```typescript
+import { Elysia } from 'elysia';
+import { Microservice } from '@elysia-microservice/core';
+import type { GuardFunction } from '@elysia-microservice/core';
+
+const app = new Elysia()
+  .use(Microservice({
+    server: { transport: 'tcp', options: { port: 4000 } }
+  }))
+  .msGuard(async (ctx) => {
+    // Check if token is present in metadata
+    const token = (ctx.meta as any)?.token;
+    if (!token) {
+      throw new Error('Unauthorized: No token provided');
+    }
+  })
+  .onMsMessage('user.get', (ctx) => {
+    // This handler won't execute if guard rejects
+    return { id: 1, name: 'John' };
+  });
+```
+
+### Global Middleware
+
+Add middleware that applies to all handlers:
+
+```typescript
+import type { Middleware } from '@elysia-microservice/core';
+
+app.msMiddleware({
+  onBefore: async (ctx) => {
+    // Can modify context and add properties
+    return {
+      requestId: crypto.randomUUID(),
+      requestTime: new Date().toISOString(),
+      role: (ctx.meta as any)?.role || 'guest'
+    };
+  },
+  onAfter: async (ctx, response) => {
+    // Always runs, even on errors
+    console.log(`[${(ctx as any).requestId}] ${ctx.pattern} completed`);
+  }
+});
+
+// Handler receives enriched context
+.onMsMessage('user.get', (ctx: any) => {
+  console.log('Request ID:', ctx.requestId); // From middleware
+  return { id: 1, name: 'John' };
+});
+```
+
+### Group Scopes
+
+Create guards and middleware for specific pattern prefixes:
+
+```typescript
+// Create a group for all user-related patterns
+const userGroup = app.msGroup('users.*');
+
+userGroup.msGuard(async (ctx) => {
+  // Only applies to patterns like users.get, users.create, etc.
+  const role = (ctx.meta as any)?.role;
+  if (role !== 'admin' && role !== 'user') {
+    throw new Error('Forbidden: Invalid role');
+  }
+});
+
+userGroup.msMiddleware({
+  onBefore: async (ctx) => {
+    return { userContext: true };
+  }
+});
+
+// Create a group for admin-only patterns
+const adminGroup = app.msGroup('admin.*');
+
+adminGroup.msGuard(async (ctx) => {
+  const role = (ctx.meta as any)?.role;
+  if (role !== 'admin') {
+    throw new Error('Forbidden: Admin access required');
+  }
+});
+
+// Handlers in these patterns are protected by group guards/middleware
+.onMsMessage('users.get', (ctx: any) => {
+  return { users: [] }; // Protected by userGroup guards
+});
+
+.onMsMessage('admin.stats', (ctx: any) => {
+  return { stats: {} }; // Protected by adminGroup guards
+});
+```
+
+### Execution Order
+
+The framework executes guards and middleware in this strict order:
+
+```
+1. Global Guards (can block)
+2. Group Guards (can block, only for matching patterns)
+3. Handler Guards (reserved for future use)
+    ↓
+4. Global Middleware.onBefore (can enrich or block)
+5. Group Middleware.onBefore (can enrich or block)
+6. Handler Middleware.onBefore (can enrich or block)
+    ↓
+7. Handler Execution
+    ↓
+8. Handler Middleware.onAfter (always runs)
+9. Group Middleware.onAfter (always runs, reverse order)
+10. Global Middleware.onAfter (always runs, reverse order)
+```
+
+### Common Patterns
+
+**Authentication:**
+```typescript
+const authGuard: GuardFunction = async (ctx) => {
+  const token = (ctx.meta as any)?.token;
+  if (!token || !isValidToken(token)) {
+    throw new Error('Unauthorized');
+  }
+};
+
+app.msGuard(authGuard);
+```
+
+**Role-Based Access Control (RBAC):**
+```typescript
+const adminGroup = app.msGroup('admin.*');
+
+adminGroup.msGuard(async (ctx) => {
+  const user = await decodeToken((ctx.meta as any)?.token);
+  if (!user || user.role !== 'admin') {
+    throw new Error('Forbidden: Admin only');
+  }
+});
+```
+
+**Request Enrichment:**
+```typescript
+app.msMiddleware({
+  onBefore: async (ctx) => {
+    const user = await decodeToken((ctx.meta as any)?.token);
+    return {
+      user,
+      userId: user?.id,
+      timestamp: Date.now()
+    };
+  }
+});
+```
+
+**Metrics Collection:**
+```typescript
+app.msMiddleware({
+  onBefore: async (ctx) => {
+    return { startTime: performance.now() };
+  },
+  onAfter: async (ctx, response) => {
+    const duration = performance.now() - (ctx as any).startTime;
+    metrics.histogram(`handler.duration.${ctx.pattern}`, duration);
+    metrics.counter(`handler.success.${ctx.pattern}`);
+  }
+});
+```
+
+**Rate Limiting per Group:**
+```typescript
+const userGroup = app.msGroup('users.*');
+
+userGroup.msMiddleware({
+  onBefore: async (ctx) => {
+    const userId = (ctx as any).userId;
+    const calls = await getRateLimit(userId);
+    if (calls > 100) {
+      throw new Error('Rate limit exceeded');
+    }
+    incrementRateLimit(userId);
+    return {};
+  }
+});
+```
+
+### Passing Metadata to Handlers
+
+When making requests, pass metadata that flows through guards/middleware:
+
+```typescript
+// Client side
+const client = createTcpClient({ port: 4000 });
+
+const result = await client.send(
+  'users.get',
+  { id: 1 },
+  { 
+    meta: { 
+      token: 'jwt-token-here',
+      role: 'admin'
+    } 
+  }
+);
+
+// Server side - metadata available in all guards/middleware/handler
+.msGuard(async (ctx) => {
+  console.log('Guard sees meta:', ctx.meta); // { token, role }
+})
+.msMiddleware({
+  onBefore: async (ctx) => {
+    console.log('Middleware sees meta:', ctx.meta);
+    return {};
+  }
+})
+.onMsMessage('users.get', (ctx) => {
+  console.log('Handler sees meta:', ctx.meta);
+  return { id: 1 };
+});
+```
+
 ## Client Factory & Proxy
 
 ### Client Factory

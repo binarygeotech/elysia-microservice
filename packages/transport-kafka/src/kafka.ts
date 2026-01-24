@@ -24,8 +24,8 @@ export async function createKafkaTransport(
       message: any;
     }) => {
       try {
-        const data = JSON.parse(message.value!.toString());
-        await registry.resolveAndRunEvent(topic, data);
+        const { data, meta } = JSON.parse(message.value!.toString());
+        await registry.resolveAndRunEvent(topic, data, { meta });
       } catch (e: any) {
         console.warn(`[Kafka Transport] Error handling event:`, e.message);
       }

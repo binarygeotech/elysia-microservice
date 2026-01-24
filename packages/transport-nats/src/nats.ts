@@ -13,8 +13,8 @@ export async function createNatsTransport(registry: any, options: NatsTransportO
     ;(async () => {
       for await (const msg of sub) {
         try {
-          const { id, data } = JSON.parse(new TextDecoder().decode(msg.data))
-          const result = await registry.resolveAndRunRequest(msg.subject || pattern, data)
+          const { id, data, meta } = JSON.parse(new TextDecoder().decode(msg.data))
+          const result = await registry.resolveAndRunRequest(msg.subject || pattern, data, { meta })
           if (msg.reply) {
             nc.publish(msg.reply, new TextEncoder().encode(JSON.stringify(result)))
           }
@@ -35,8 +35,8 @@ export async function createNatsTransport(registry: any, options: NatsTransportO
     ;(async () => {
       for await (const msg of sub) {
         try {
-          const data = JSON.parse(new TextDecoder().decode(msg.data))
-          await registry.resolveAndRunEvent(msg.subject || pattern, data)
+          const { data, meta } = JSON.parse(new TextDecoder().decode(msg.data))
+          await registry.resolveAndRunEvent(msg.subject || pattern, data, { meta })
         } catch (e: any) {
           console.warn(`[NATS Transport] Error handling event:`, e.message)
         }

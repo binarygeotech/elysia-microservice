@@ -26,7 +26,9 @@
 - 🔌 **Plugin Mode** - Seamless integration with Elysia (HTTP + Microservice)
 - ⚡ **Standalone Mode** - Pure microservice applications without HTTP
 - 🎯 **Advanced Pattern Matching** - Wildcards (`user.*`), regex, and catchall handlers
-- 🔀 **Transport Agnostic** - Support for TCP, TLS, NATS, Redis, and Kafka
+- � **Guards & Middleware** - Hierarchical DI system with global, group, and handler scopes
+- 🎭 **Middleware & Guards** - Authorization guards, request enrichment middleware, cross-cutting concerns
+- �🔀 **Transport Agnostic** - Support for TCP, TLS, NATS, Redis, and Kafka
 - 📦 **Modular** - Install only what you need, tree-shakable bundles
 - 🔄 **Service Discovery** - Static and DNS-based service discovery
 - ⚖️ **Load Balancing** - Round-robin with failure tracking

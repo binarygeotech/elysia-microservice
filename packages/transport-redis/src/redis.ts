@@ -16,8 +16,8 @@ export async function createRedisTransport(
   for (const pattern of requestPatterns) {
     sub.subscribe(pattern, async (message, channel) => {
       try {
-        const { id, data } = JSON.parse(message);
-        const result = await registry.resolveAndRunRequest(channel || pattern, data);
+        const { id, data, meta } = JSON.parse(message);
+        const result = await registry.resolveAndRunRequest(channel || pattern, data, { meta });
         await pub.publish(`${channel || pattern}:res:${id}`, JSON.stringify(result));
       } catch (e: any) {
         console.warn(`[Redis Transport] Error handling request:`, e.message);
@@ -32,8 +32,8 @@ export async function createRedisTransport(
   for (const pattern of eventPatterns) {
     sub.subscribe(pattern, async (message, channel) => {
       try {
-        const data = JSON.parse(message);
-        await registry.resolveAndRunEvent(channel || pattern, data);
+        const { data, meta } = JSON.parse(message);
+        await registry.resolveAndRunEvent(channel || pattern, data, { meta });
       } catch (e: any) {
         console.warn(`[Redis Transport] Error handling event:`, e.message);
       }
