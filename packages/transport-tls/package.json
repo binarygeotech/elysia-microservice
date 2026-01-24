@@ -1,6 +1,6 @@
 {
   "name": "@elysia-microservice/transport-tls",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "description": "TLS transport for Elysia microservices",
   "author": {
     "name": "Okojie George",

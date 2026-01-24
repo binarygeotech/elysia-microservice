@@ -1,6 +1,6 @@
 {
   "name": "@elysia-microservice/client-base",
-  "version": "0.1.6",
+  "version": "1.0.0",
   "description": "Base client utilities and factory for Elysia microservices",
   "author": {
     "name": "Okojie George",
@@ -39,11 +39,11 @@
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "@elysia-microservice/client-tcp": "^0.1.6",
-    "@elysia-microservice/client-tls": "^0.1.6",
-    "@elysia-microservice/client-nats": "^0.1.6",
-    "@elysia-microservice/client-redis": "^0.1.6",
-    "@elysia-microservice/client-kafka": "^0.1.6"
+    "@elysia-microservice/client-tcp": "^0.2.0",
+    "@elysia-microservice/client-tls": "^0.2.0",
+    "@elysia-microservice/client-nats": "^0.2.0",
+    "@elysia-microservice/client-redis": "^0.2.0",
+    "@elysia-microservice/client-kafka": "^0.2.0"
   },
   "peerDependenciesMeta": {
     "@elysia-microservice/client-tcp": {
